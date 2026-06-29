@@ -1,4 +1,4 @@
-# Agent 指南
+# STSInitialDeckAttrition — Agent 指南
 
 供自动化 Agent 快速理解本仓库。人类读者也可从 `docs/项目计划书.md` 进入。
 
@@ -96,7 +96,7 @@ data/sts2/           # 游戏数据 JSON（见 docs/游戏数据格式.md）
 ## 5. 常用命令
 
 ```powershell
-cd D:\Projects\STSDamageInFirstFight
+# 在仓库根目录执行
 python tests\test_manual.py
 python scripts\run_pilot.py --turns 8 --hp 47 48 49 --progress
 ```
