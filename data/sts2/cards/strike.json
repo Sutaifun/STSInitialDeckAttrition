@@ -1,0 +1,8 @@
+{
+  "id": "strike",
+  "name": "打击",
+  "cost": 1,
+  "type": "attack",
+  "damage": 6,
+  "target": "enemy"
+}

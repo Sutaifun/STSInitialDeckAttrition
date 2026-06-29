@@ -1,0 +1,131 @@
+# Agent 指南
+
+供自动化 Agent 快速理解本仓库。人类读者也可从 `docs/项目计划书.md` 进入。
+
+---
+
+## 1. 项目是什么
+
+量化比较 **Slay the Spire 1（塔1）** 与 **Slay the Spire 2（塔2）** 在 **首场弱怪战斗** 中的战损差异。
+
+- **不**接游戏本体、**不**用真实游玩日志。
+- 用 wiki / 已录入 JSON 描述怪物与初始卡组，枚举 **抽牌路线** ω，在 **完美信息 + 最优出牌** 下求每场 **D(ω)** = 最小总战损。
+- 核心统计：**加权** \(P(D>0)\)、加权期望战损、分布（权重 w(ω) 来自组合多重数，**非等权**）。
+
+当前试点：**塔2 A10 · 铁甲战士 vs 海洋混混**（HP 47/48/49 各算一遍）。
+
+---
+
+## 2. 文档地图（先读这些）
+
+| 路径 | 内容 |
+|------|------|
+| `docs/项目计划书.md` | 目标、范围、进度 |
+| `docs/游戏机制.md` | 战斗规则（能量、格挡、buff、诅咒） |
+| `docs/抽牌枚举协议.md` | 多重集抽牌、稳态循环、**组合权重** |
+| `docs/求解器设计.md` | **权威技术方案**：DFS 打到击杀、层2 DP、剪枝、内存、输出路线图 |
+| `docs/游戏数据格式.md` | JSON 目录与 schema |
+| `data/sts2/pilot_ironclad_vs_seapunk.md` | 当前试点设定摘要 |
+
+**技术决策以 `docs/求解器设计.md` 为准。** 其中标注为「过渡实现」的代码行为可能被替换。
+
+---
+
+## 3. 代码结构
+
+```text
+engine/
+  types.py           # State, Pile, SolveResult
+  deck.py            # 多重集 Pile、组合抽牌、IRONCLAD_A10_DECK
+  combat.py          # 出牌/回合/敌人意图、incoming_damage、can_kill_this_turn
+  draw_scheduler.py  # 抽牌组合枚举、定长路径 enumerate_draw_paths（待改 DFS 单步）
+  solver.py          # _PathSolver（路径内 memo）、solve_encounter
+  progress.py        # ConsoleProgress / NullProgress
+
+scripts/
+  run_pilot.py       # 命令行试点；--progress --turns --hp --gc-interval
+
+tests/
+  test_manual.py     # 手算用例
+
+data/sts2/           # 游戏数据 JSON（见 docs/游戏数据格式.md）
+```
+
+### 3.1 两层求解器
+
+1. **层 1 抽牌**：DFS 展开上手组合（目标）；每叶带权重 w(ω)。  
+2. **层 2 出牌**：固定抽牌后缀下的最小战损 DP + 单回合剪枝。
+
+### 3.2 关键表示
+
+- **Pile** = `tuple[int,int,int,int]` = (打击, 防御, 痛击, 诅咒) 张数；**不**枚举牌序。
+- **State**：回合初完整局面（`engine/types.py`）。
+- 弃牌堆成分由 **抽牌路径** 决定，与出牌无关（`docs/抽牌枚举协议.md` §7）。
+
+### 3.3 层 2 剪枝（已实现，文档 §5）
+
+1. 本回合可击杀 → 只走击杀分支。  
+2. 格挡已够 → 不打防、不空过，有攻击就打。  
+3. 手牌无防可打 → 剩余费用全力攻击。
+
+### 3.4 内存
+
+- **禁止**跨路径无限 `lru_cache`（曾 OOM）。  
+- 使用 `_PathSolver` **路径内 memo**，路径结束即释放。  
+- `solve_encounter` 流式聚合，不保留全部 D(ω) 列表（除非未来 `--export`）。
+
+---
+
+## 4. 实现状态 vs 目标
+
+| 能力 | 状态 |
+|------|------|
+| 战斗引擎 + 剪枝 | ✅ |
+| 路径内 memo + gc | ✅ |
+| 进度条 `--progress` | ✅ |
+| 定长 `max_turns` 枚举 + **等权**统计 | ⚠️ 过渡，`run_pilot.py` |
+| DFS 打到击杀 | ❌ 待做 |
+| 加权 w(ω) 汇总 | ❌ 待做 |
+| JSON 加载器 | ❌ 数据在 JSON，引擎仍硬编码 |
+| 路线明细 JSONL 导出 | ❌ 第二版 |
+
+改求解逻辑前请读 `docs/求解器设计.md` §8 路线图，避免恢复已废弃的定长截断 / 等权 / 全局 cache。
+
+---
+
+## 5. 常用命令
+
+```powershell
+cd D:\Projects\STSDamageInFirstFight
+python tests\test_manual.py
+python scripts\run_pilot.py --turns 8 --hp 47 48 49 --progress
+```
+
+PowerShell 用 `;` 链接命令，不用 `&&`。长跑建议 `sys.setrecursionlimit` 已设在 `run_pilot.py`。
+
+---
+
+## 6. 扩展数据时
+
+1. 按 `docs/游戏数据格式.md` 增加 JSON。  
+2. 更新或新增 `pilot_*.md`。  
+3. 实现/扩展 JSON → `engine` 加载（勿长期双份硬编码）。  
+4. 新角色/怪：确认是否适用 `docs/抽牌枚举协议.md`（静默猎手**不适用**）。
+
+---
+
+## 7. 不要做的事
+
+- 不要枚举牌序或全排列洗牌（应用组合 + 权重）。  
+- 不要用固定回合截断当最终统计（会低估长局战损）。  
+- 不要对抽牌路线等权算概率。  
+- 不要未经请求提交 git、不要扩写无关文档。  
+- 用户交流使用 **中文**。
+
+---
+
+## 8. 仓库内无
+
+- 无 `requirements.txt`（当前仅标准库）。  
+- 无塔1 `data/sts1/`（待建）。  
+- 无 CI。

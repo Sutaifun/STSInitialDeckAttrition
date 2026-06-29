@@ -1,0 +1,16 @@
+{
+  "id": "ironclad",
+  "name": "铁甲战士",
+  "starting_deck": [
+    { "card": "strike", "count": 5 },
+    { "card": "defend", "count": 4 },
+    { "card": "bash", "count": 1 },
+    { "card": "ascenders_bane", "count": 1 }
+  ],
+  "relic": {
+    "id": "burning_blood",
+    "name": "燃烧之血",
+    "in_combat": false,
+    "note": "战斗结束后回复 6 血量；本场模拟不计遗物效果"
+  }
+}

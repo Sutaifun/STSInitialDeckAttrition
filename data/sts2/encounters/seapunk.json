@@ -1,0 +1,46 @@
+{
+  "id": "seapunk_solo",
+  "name": "海洋混混",
+  "act": 1,
+  "pool": "weak",
+  "biome": "underdocks",
+  "ascension_note": "数值含低进阶与 A10 两档；括号内为高进阶（A10）采用值",
+  "monsters": [
+    {
+      "id": "seapunk",
+      "name": "海洋混混",
+      "max_hp": {
+        "low": { "min": 44, "max": 46 },
+        "high": { "min": 47, "max": 49 },
+        "solve": "enumerate_each"
+      },
+      "moves": [
+        {
+          "id": "A",
+          "intent": "attack",
+          "damage": { "low": 11, "high": 13 },
+          "hits": 1
+        },
+        {
+          "id": "B",
+          "intent": "attack",
+          "damage": 2,
+          "hits": 4
+        },
+        {
+          "id": "C",
+          "intent": "defend_buff",
+          "block": { "low": 7, "high": 8 },
+          "strength": { "low": 1, "high": 2 }
+        }
+      ],
+      "pattern": {
+        "opening": "A",
+        "cycle": ["A", "B", "C"]
+      }
+    }
+  ],
+  "notes": [
+    "A10 下理论上不可能无战损（尚未验证）"
+  ]
+}
