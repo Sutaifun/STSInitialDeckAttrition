@@ -6,17 +6,16 @@ from dataclasses import replace
 from typing import Optional
 
 from engine.deck import BANE, BASH, CARD_INDEX, DEFEND, Pile, STRIKE, pile_add
+from engine.load_data import build_card_stats, build_intents
 from engine.types import ENERGY_PER_TURN, EMPTY_PILE, State
 
-SEAPUNK_INTENTS = (
-    {"kind": "attack", "damage": 13, "hits": 1},
-    {"kind": "attack", "damage": 2, "hits": 4},
-    {"kind": "buff", "block": 8, "strength": 2},
-)
+# 敌人意图循环：从 data/sts2/encounters/seapunk.json 的 A10 档加载。
+SEAPUNK_INTENTS = build_intents()
 
-CARD_COST = {STRIKE: 1, DEFEND: 1, BASH: 2, BANE: None}
-CARD_DAMAGE = {STRIKE: 6, BASH: 8}
-CARD_BLOCK = {DEFEND: 5}
+# 卡牌数值：从 data/sts2/cards/*.json 加载（费用/伤害/格挡/易伤层数）。
+CARD_COST, CARD_DAMAGE, CARD_BLOCK, _CARD_VULNERABLE = build_card_stats()
+# 痛击施加的易伤层数（数据驱动，替代内联 +2）。
+BASH_VULNERABLE = _CARD_VULNERABLE.get(BASH, 0)
 PLAYABLE = (STRIKE, DEFEND, BASH)
 ATTACKS = (BASH, STRIKE)
 
@@ -168,7 +167,7 @@ def _can_kill_impl(
         absorbed = min(enemy_block, dmg)
         new_hp = enemy_hp - (dmg - absorbed)
         new_block = enemy_block - absorbed
-        new_vuln = enemy_vulnerable + (2 if card == BASH else 0)
+        new_vuln = enemy_vulnerable + (BASH_VULNERABLE if card == BASH else 0)
 
         if _can_kill_impl(
             new_hp,
@@ -233,7 +232,7 @@ def play_card(state: State, card: str) -> Optional[State]:
             CARD_DAMAGE[BASH], nxt.player_strength, nxt.player_weak, nxt.enemy_vulnerable
         )
         nxt = _deal_damage_to_enemy(nxt, dmg)
-        nxt = replace(nxt, enemy_vulnerable=nxt.enemy_vulnerable + 2)
+        nxt = replace(nxt, enemy_vulnerable=nxt.enemy_vulnerable + BASH_VULNERABLE)
     elif card == DEFEND:
         block = _calc_block(CARD_BLOCK[DEFEND], nxt.player_dexterity, nxt.player_frail)
         nxt = replace(nxt, player_block=nxt.player_block + block)

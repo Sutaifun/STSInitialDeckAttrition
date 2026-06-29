@@ -42,11 +42,13 @@ class ConsoleProgress:
     _label: str = ""
     _total: int = 0
     _current: int = 0
+    _indeterminate: bool = False
     _t0: float = 0.0
     _last_print: float = 0.0
 
     def on_start(self, total: int, label: str) -> None:
         self._label = label
+        self._indeterminate = total <= 0
         self._total = max(total, 1)
         self._current = 0
         self._t0 = time.perf_counter()
@@ -55,7 +57,9 @@ class ConsoleProgress:
 
     def on_step(self, current: int, total: int, label: str) -> None:
         self._current = current
-        self._total = max(total, 1)
+        if total > 0:
+            self._indeterminate = False
+            self._total = total
         self._label = label
         self._render(force=False)
 
@@ -72,12 +76,24 @@ class ConsoleProgress:
         self._last_print = now
 
         elapsed = elapsed_s if elapsed_s is not None else (now - self._t0)
+        rate = self._current / elapsed if elapsed > 0 else 0.0
+
+        if self._indeterminate and not done:
+            # 总数未知（DFS 打到击杀）：只显示已处理路线数与速率。
+            spin = "=" * (self._current % (self.width + 1))
+            line = (
+                f"\r{self._label}  [{spin:<{self.width}}] {self._current} 条 "
+                f"{rate:6.1f}/s {_format_duration(elapsed)}"
+            )
+            self.stream.write(line)
+            self.stream.flush()
+            return
+
         pct = self._current / self._total
         filled = int(self.width * pct)
         bar = "=" * filled + (">" if filled < self.width and not done else "") + " " * (
             self.width - filled - (1 if filled < self.width and not done else 0)
         )
-        rate = self._current / elapsed if elapsed > 0 else 0.0
         if done or rate <= 0:
             eta_s = 0.0
         else:

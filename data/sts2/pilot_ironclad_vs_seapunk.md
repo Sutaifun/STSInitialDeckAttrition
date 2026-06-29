@@ -44,7 +44,9 @@
 
 ## 求解与统计
 
-见 `docs/求解器设计.md`：DFS 打到击杀、路线加权、层 2 最优出牌。当前 `scripts/run_pilot.py` 仍为过渡实现（定长回合 + 等权），以文档目标形态为准。数据 JSON 见 `docs/游戏数据格式.md`。
+见 `docs/求解器设计.md`：DFS 打到击杀、路线加权、层 2 最优出牌。`scripts/run_pilot.py` 已是目标形态（DFS 打到击杀 + `Fraction` 加权统计）。数据 JSON 见 `docs/游戏数据格式.md`。
+
+**当前结果**：HP 47/48/49 均 P(必伤)=1.0；加权期望战损 ≈ **7.58 / 7.74 / 8.91**，战损区间 **3–31**（最深停止回合 = 8）。运行：`python scripts/run_pilot.py --hp 47 48 49 --dist`；导出路线明细 `--export DIR`。
 
 ## 角色血量
 

@@ -5,6 +5,8 @@ from __future__ import annotations
 import math
 from typing import Iterator
 
+from engine.load_data import build_deck_pile
+
 STRIKE = "S"
 DEFEND = "D"
 BASH = "B"
@@ -13,8 +15,8 @@ BANE = "X"
 CARD_ORDER = (STRIKE, DEFEND, BASH, BANE)
 CARD_INDEX = {c: i for i, c in enumerate(CARD_ORDER)}
 
-# 铁甲战士 A10：5 打 4 防 1 痛击 1 诅咒
-IRONCLAD_A10_DECK: tuple[int, int, int, int] = (5, 4, 1, 1)
+# 铁甲战士 A10 牌组：从 data/sts2/characters/ironclad.json 加载（= 5 打 4 防 1 痛击 1 诅咒）。
+IRONCLAD_A10_DECK: tuple[int, int, int, int] = build_deck_pile()
 
 Pile = tuple[int, int, int, int]
 
@@ -72,6 +74,18 @@ def combinations_draw(pool: Pile, k: int) -> Iterator[tuple[Pile, Pile]]:
             picked.pop()
 
     yield from rec(0, k, [])
+
+
+def combination_weight(pool: Pile, drawn: Pile) -> int:
+    """
+    从 pool 中恰好抽出 drawn 这一组合的多重数（被压缩的物理条数）。
+    ways(pool, drawn) = ∏ᵢ C(pool[i], drawn[i])。
+    抽到该组合的概率 = ways / C(∑pool, ∑drawn)（见 docs/抽牌枚举协议.md §8）。
+    """
+    w = 1
+    for p, d in zip(pool, drawn):
+        w *= math.comb(p, d)
+    return w
 
 
 def opening_hand_combinations() -> Iterator[tuple[Pile, Pile]]:

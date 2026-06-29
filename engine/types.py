@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from fractions import Fraction
 from typing import Tuple
 
 # (打击, 防御, 痛击, 诅咒)
@@ -53,3 +54,24 @@ class SolveResult:
     play_path: Tuple[str, ...]
     end_state: State | None
     combat_over: bool
+
+
+@dataclass(frozen=True)
+class TurnTrace:
+    """单回合最优出牌明细（用于路线导出）。"""
+
+    turn: int
+    hand: Pile  # 本回合抽到的上手牌（多重集）
+    plays: Tuple[str, ...]  # 按序打出的牌（S/D/B；诅咒不可打出故不出现）
+    damage_after: int  # 本回合结束后的累计战损（含本回合敌人攻击；若本回合击杀则不含）
+    enemy_hp_after_plays: int  # 本回合出牌后的敌人 HP（敌人行动不改其 HP）
+
+
+@dataclass(frozen=True)
+class PathResult:
+    """单条抽牌路线 ω 的完整结果（用于 JSONL 导出）。"""
+
+    weight: Fraction  # w(ω)，组合权重（精确分数）
+    min_damage: int  # D(ω)，最优总战损
+    opening_hand: Pile  # 第 1 回合上手
+    turns: Tuple[TurnTrace, ...]

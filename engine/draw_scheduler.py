@@ -2,10 +2,19 @@
 
 from __future__ import annotations
 
+import math
 from dataclasses import dataclass
+from fractions import Fraction
 from typing import Iterator
 
-from engine.deck import IRONCLAD_A10_DECK, combinations_draw, opening_hand_combinations, pile_add, pile_total
+from engine.deck import (
+    IRONCLAD_A10_DECK,
+    combination_weight,
+    combinations_draw,
+    opening_hand_combinations,
+    pile_add,
+    pile_total,
+)
 from engine.types import EMPTY_PILE, HAND_SIZE, MAX_TURNS, Pile
 
 
@@ -68,6 +77,73 @@ def _end_turn_piles(piles: TurnPiles) -> tuple[Pile, Pile, Pile]:
         discard = (discard[0], discard[1], discard[2], discard[3] - bane)
         exhaust = (exhaust[0], exhaust[1], exhaust[2], exhaust[3] + bane)
     return piles.draw, discard, exhaust
+
+
+def end_turn_piles(piles: TurnPiles) -> tuple[Pile, Pile, Pile]:
+    """公开别名：回合末 (draw, discard, exhaust) 更新。"""
+    return _end_turn_piles(piles)
+
+
+# ---------------------------------------------------------------------------
+# 带权抽牌枚举（DFS 打到击杀用）：每个上手组合附带其出现概率 step_p。
+# step_p = ways(pool, drawn) / C(∑pool, k)，见 docs/抽牌枚举协议.md §8。
+# ---------------------------------------------------------------------------
+
+
+def weighted_opening() -> Iterator[tuple[TurnPiles, Fraction]]:
+    """第 1 回合：11 选 5 的所有组合 + 概率权重。"""
+    denom = math.comb(pile_total(IRONCLAD_A10_DECK), HAND_SIZE)
+    for drawn, left in opening_hand_combinations():
+        ways = combination_weight(IRONCLAD_A10_DECK, drawn)
+        tp = TurnPiles(hand=drawn, draw=left, discard=EMPTY_PILE, exhaust=EMPTY_PILE)
+        yield tp, Fraction(ways, denom)
+
+
+def weighted_draw_at_turn_start(
+    draw: Pile, discard: Pile, exhaust: Pile
+) -> Iterator[tuple[TurnPiles, Fraction]]:
+    """后续回合：从 draw/discard 抽满 5 张的所有组合 + 概率权重。"""
+    for hand, new_draw, new_discard, p in _wdraw_rec(draw, discard, EMPTY_PILE, HAND_SIZE):
+        yield TurnPiles(hand=hand, draw=new_draw, discard=new_discard, exhaust=exhaust), p
+
+
+def _wdraw_rec(
+    draw: Pile,
+    discard: Pile,
+    hand: Pile,
+    need: int,
+) -> Iterator[tuple[Pile, Pile, Pile, Fraction]]:
+    """带权版 _draw_rec：产出 (hand, draw_left, discard_left, step_p)。"""
+    if need == 0:
+        yield hand, draw, discard, Fraction(1)
+        return
+
+    draw_n = pile_total(draw)
+    if draw_n > 0:
+        if draw_n <= need:
+            merged = pile_add(hand, draw)
+            for h, d, disc, p in _wdraw_rec(EMPTY_PILE, discard, merged, need - draw_n):
+                yield h, d, disc, p
+        else:
+            denom = math.comb(draw_n, need)
+            for drawn, left in combinations_draw(draw, need):
+                ways = combination_weight(draw, drawn)
+                yield pile_add(hand, drawn), left, discard, Fraction(ways, denom)
+        return
+
+    discard_n = pile_total(discard)
+    if discard_n == 0:
+        yield hand, draw, discard, Fraction(1)
+        return
+
+    if discard_n <= need:
+        yield pile_add(hand, discard), EMPTY_PILE, EMPTY_PILE, Fraction(1)
+        return
+
+    denom = math.comb(discard_n, need)
+    for drawn, left in combinations_draw(discard, need):
+        ways = combination_weight(discard, drawn)
+        yield pile_add(hand, drawn), left, EMPTY_PILE, Fraction(ways, denom)
 
 
 def enumerate_draw_paths(max_turns: int = MAX_TURNS) -> Iterator[tuple[TurnPiles, ...]]:

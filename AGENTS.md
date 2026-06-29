@@ -35,15 +35,16 @@
 
 ```text
 engine/
-  types.py           # State, Pile, SolveResult
-  deck.py            # 多重集 Pile、组合抽牌、IRONCLAD_A10_DECK
-  combat.py          # 出牌/回合/敌人意图、incoming_damage、can_kill_this_turn
-  draw_scheduler.py  # 抽牌组合枚举、定长路径 enumerate_draw_paths（待改 DFS 单步）
-  solver.py          # _PathSolver（路径内 memo）、solve_encounter
+  types.py           # State, Pile, SolveResult, TurnTrace, PathResult
+  load_data.py       # 从 data/sts2/*.json 构建牌组/卡牌数值/敌人意图（去硬编码）
+  deck.py            # 多重集 Pile、组合抽牌、IRONCLAD_A10_DECK（← load_data）
+  combat.py          # 出牌/回合/敌人意图、incoming_damage、can_kill_this_turn（数值 ← load_data）
+  draw_scheduler.py  # 抽牌组合枚举、带权单步、定长路径 enumerate_draw_paths
+  solver.py          # 增量前沿 DP solve_encounter；_PathSolver（导出/复核）、within_turn
   progress.py        # ConsoleProgress / NullProgress
 
 scripts/
-  run_pilot.py       # 命令行试点；--progress --turns --hp --gc-interval
+  run_pilot.py       # 命令行试点；--progress --hp --gc-interval --hard-cap --dist --export
 
 tests/
   test_manual.py     # 手算用例
@@ -53,8 +54,8 @@ data/sts2/           # 游戏数据 JSON（见 docs/游戏数据格式.md）
 
 ### 3.1 两层求解器
 
-1. **层 1 抽牌**：DFS 展开上手组合（目标）；每叶带权重 w(ω)。  
-2. **层 2 出牌**：固定抽牌后缀下的最小战损 DP + 单回合剪枝。
+1. **层 1 抽牌**：DFS 展开上手组合；每叶带权重 w(ω)。  
+2. **层 2 出牌**：`solve_encounter` 用**增量前沿 DP**——沿抽牌 DFS 维护「战斗状态前沿」（每个回合初战斗状态 → 最小累计战损），每回合用 `within_turn` 把前沿推进一步，停在 `best_kill ≤ surv`。不再每个前缀从头重解（旧 `_PathSolver` 每前缀重建会慢且其近似击杀判定会低估战损）。`_PathSolver`（精确）仅用于导出/逐条复核。
 
 ### 3.2 关键表示
 
@@ -82,14 +83,15 @@ data/sts2/           # 游戏数据 JSON（见 docs/游戏数据格式.md）
 |------|------|
 | 战斗引擎 + 剪枝 | ✅ |
 | 路径内 memo + gc | ✅ |
-| 进度条 `--progress` | ✅ |
-| 定长 `max_turns` 枚举 + **等权**统计 | ⚠️ 过渡，`run_pilot.py` |
-| DFS 打到击杀 | ❌ 待做 |
-| 加权 w(ω) 汇总 | ❌ 待做 |
-| JSON 加载器 | ❌ 数据在 JSON，引擎仍硬编码 |
-| 路线明细 JSONL 导出 | ❌ 第二版 |
+| 进度条 `--progress`（支持未知总数） | ✅ |
+| **DFS 打到击杀**（增量前沿 DP，停止条件 `best_kill ≤ surv`） | ✅ |
+| **加权 w(ω) 汇总**（`Fraction` 精确，`P`/`E[D]`/分布） | ✅ |
+| JSON 加载器（`engine/load_data.py`，引擎已去硬编码） | ✅ |
+| 路线明细 JSONL 导出（`--export`，回放校验） | ✅ |
 
-改求解逻辑前请读 `docs/求解器设计.md` §8 路线图，避免恢复已废弃的定长截断 / 等权 / 全局 cache。
+改求解逻辑前请读 `docs/求解器设计.md` §4（停止条件）+ §8 路线图，避免恢复已废弃的定长截断 / 等权 / 全局 cache。
+
+> ⚠️ **关键陷阱**：不要一见「本回合可击杀」就停止延长抽牌树。为早杀牺牲格挡反而更亏；正确停止条件是「强制击杀的最小战损 `killd` 降到仅生存的下界 `surv`」（详见 `docs/求解器设计.md` §4 / §5.1）。
 
 ---
 
