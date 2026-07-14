@@ -1,0 +1,11 @@
+{
+  "id": "dualcast",
+  "name": "双重释放",
+  "cost": 1,
+  "type": "skill",
+  "target": "self",
+  "effects": [
+    { "type": "evoke", "orb": "rightmost", "times": 2 }
+  ],
+  "note": "激发最右侧充能球两次"
+}

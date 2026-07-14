@@ -1,0 +1,11 @@
+{
+  "id": "venerate",
+  "name": "崇拜",
+  "cost": 1,
+  "type": "skill",
+  "target": "self",
+  "effects": [
+    { "type": "gain_stars", "amount": 2 }
+  ],
+  "note": "获得辉星；辉星可跨回合保存"
+}

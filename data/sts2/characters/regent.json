@@ -1,0 +1,51 @@
+{
+  "id": "regent",
+  "name": "储君",
+  "game": "sts2",
+  "starting_deck": [
+    { "card": "strike", "count": 4 },
+    { "card": "defend", "count": 4 },
+    { "card": "falling_star", "count": 1 },
+    { "card": "venerate", "count": 1 },
+    { "card": "ascenders_bane", "count": 1 }
+  ],
+  "relic": {
+    "id": "divine_right",
+    "name": "天赋君权",
+    "in_combat": true,
+    "note": "每场战斗开始时，获得 3 辉星"
+  },
+  "first_fight_model": {
+    "solver_status": "data_only",
+    "draw": {
+      "regular_hand_size": 5,
+      "opening_hand_size": 5,
+      "opening_hand_source": "default",
+      "deck_includes_ascenders_bane": true
+    },
+    "first_fight_scope": {
+      "in_scope": [
+        "11 选 5 抽牌",
+        "辉星（可跨回合保存）",
+        "天赋君权开战 +3 辉星",
+        "崇拜 +2 辉星",
+        "陨星：0 费 + 2 辉星，8 伤 + 1 弱 + 1 易伤"
+      ],
+      "out_of_scope": [
+        "铸剑（Forge）",
+        "王座剑、星耗尽遗物联动",
+        "非初始牌池的辉星产卡"
+      ],
+      "relic_combat": [
+        {
+          "relic": "divine_right",
+          "effect": "gain_stars",
+          "timing": "combat_start",
+          "amount": 3,
+          "note": "获得 3 辉星"
+        }
+      ]
+    },
+    "mechanics_doc": "docs/角色战斗机制.md#储君"
+  }
+}

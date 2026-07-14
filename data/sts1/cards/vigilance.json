@@ -1,0 +1,11 @@
+{
+  "id": "vigilance",
+  "name": "警惕",
+  "cost": 2,
+  "type": "skill",
+  "block": 8,
+  "target": "self",
+  "effects": [
+    { "type": "enter_stance", "stance": "calm", "stance_name": "平静" }
+  ]
+}

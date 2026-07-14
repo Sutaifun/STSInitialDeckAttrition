@@ -1,0 +1,62 @@
+{
+  "id": "toadpoles_weak",
+  "name": "蝌蚪（弱）",
+  "act": 1,
+  "pool": "weak",
+  "biome": "underdocks",
+  "ascension_note": "数值含低进阶与 A10 两档",
+  "monsters": [
+    {
+      "id": "toadpole",
+      "name": "蝌蚪",
+      "count": 2,
+      "pattern_offset": [2, 0],
+      "max_hp": {
+        "low": { "min": 21, "max": 25 },
+        "high": { "min": 22, "max": 26 },
+        "solve": "enumerate_each"
+      },
+      "powers": [
+        {
+          "id": "thorns",
+          "name": "荆棘",
+          "type": "intensity",
+          "amount": 0,
+          "note": "被攻击时反弹等量伤害；由招式尖刺化增减层数"
+        }
+      ],
+      "moves": [
+        {
+          "id": "A",
+          "name": "旋转",
+          "intent": "attack",
+          "damage": { "low": 7, "high": 8 },
+          "hits": 1
+        },
+        {
+          "id": "B",
+          "name": "尖刺化",
+          "intent": "buff",
+          "effects": [{ "type": "gain_power", "power": "thorns", "amount": 2 }]
+        },
+        {
+          "id": "C",
+          "name": "吐刺",
+          "intent": "attack",
+          "damage": { "low": 3, "high": 4 },
+          "hits": 3,
+          "effects": [{ "type": "remove_power", "power": "thorns", "amount": 2 }]
+        }
+      ],
+      "pattern": {
+        "opening": "A",
+        "cycle": ["A", "B", "C"]
+      }
+    }
+  ],
+  "notes": [
+    "弱遭遇：前排蝌蚪（pattern_offset=0）首回合改为尖刺化，即起手 B 而非 cycle 默认 A",
+    "此处用 pattern_offset [2,0] 表示后排仍按 Whirl→Spiken→Spike 循环，前排起手为 B",
+    "荆棘反伤对最优出牌有影响；求解器 status: data_only"
+  ]
+}

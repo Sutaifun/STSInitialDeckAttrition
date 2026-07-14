@@ -25,9 +25,11 @@
 | `docs/抽牌枚举协议.md` | 多重集抽牌、稳态循环、**组合权重** |
 | `docs/求解器设计.md` | **权威技术方案**：DFS 打到击杀、层2 DP、剪枝、内存、输出路线图 |
 | `docs/游戏数据格式.md` | JSON 目录与 schema |
+| `docs/角色战斗机制.md` | 六角色首场机制、译名对照、`first_fight_model` 说明 |
 | `data/sts2/pilot_ironclad_vs_seapunk.md` | 当前试点设定摘要 |
+| `data/sts2/README.md` / `data/sts1/README.md` | 角色与遭遇数据索引 |
 
-**技术决策以 `docs/求解器设计.md` 为准。** 其中标注为「过渡实现」的代码行为可能被替换。
+**技术决策以 `docs/求解器设计.md` 为准。**
 
 ---
 
@@ -49,7 +51,8 @@ scripts/
 tests/
   test_manual.py     # 手算用例
 
-data/sts2/           # 游戏数据 JSON（见 docs/游戏数据格式.md）
+data/sts1/           # 塔1 角色 JSON（遭遇待录）
+data/sts2/           # 塔2 角色、卡牌、遭遇 JSON（见各 README）
 ```
 
 ### 3.1 两层求解器
@@ -73,7 +76,7 @@ data/sts2/           # 游戏数据 JSON（见 docs/游戏数据格式.md）
 
 - **禁止**跨路径无限 `lru_cache`（曾 OOM）。  
 - 使用 `_PathSolver` **路径内 memo**，路径结束即释放。  
-- `solve_encounter` 流式聚合，不保留全部 D(ω) 列表（除非未来 `--export`）。
+- `solve_encounter` 流式聚合，不保留全部 D(ω) 列表（`--export` 时写 JSONL）。
 
 ---
 
@@ -91,7 +94,7 @@ data/sts2/           # 游戏数据 JSON（见 docs/游戏数据格式.md）
 
 改求解逻辑前请读 `docs/求解器设计.md` §4（停止条件）+ §8 路线图，避免恢复已废弃的定长截断 / 等权 / 全局 cache。
 
-> ⚠️ **关键陷阱**：不要一见「本回合可击杀」就停止延长抽牌树。为早杀牺牲格挡反而更亏；正确停止条件是「强制击杀的最小战损 `killd` 降到仅生存的下界 `surv`」（详见 `docs/求解器设计.md` §4 / §5.1）。
+> ⚠️ **关键陷阱**：不要一见「本回合可击杀」就停止延长抽牌树。正确停止条件是 **`best_kill ≤ surv`**（详见 `docs/求解器设计.md` §4）。
 
 ---
 
@@ -100,7 +103,8 @@ data/sts2/           # 游戏数据 JSON（见 docs/游戏数据格式.md）
 ```powershell
 # 在仓库根目录执行
 python tests\test_manual.py
-python scripts\run_pilot.py --turns 8 --hp 47 48 49 --progress
+python scripts\run_pilot.py --hp 47 48 49 --progress --dist
+python scripts\run_pilot.py --hp 47 --export data/exports
 ```
 
 PowerShell 用 `;` 链接命令，不用 `&&`。长跑建议 `sys.setrecursionlimit` 已设在 `run_pilot.py`。
@@ -112,7 +116,7 @@ PowerShell 用 `;` 链接命令，不用 `&&`。长跑建议 `sys.setrecursionli
 1. 按 `docs/游戏数据格式.md` 增加 JSON。  
 2. 更新或新增 `pilot_*.md`。  
 3. 实现/扩展 JSON → `engine` 加载（勿长期双份硬编码）。  
-4. 新角色/怪：确认是否适用 `docs/抽牌枚举协议.md`（静默猎手**不适用**）。
+4. 新角色：确认 `docs/抽牌枚举协议.md` 协议档（标准档 / 猎手档）；机制见 `docs/角色战斗机制.md`。
 
 ---
 
@@ -129,5 +133,5 @@ PowerShell 用 `;` 链接命令，不用 `&&`。长跑建议 `sys.setrecursionli
 ## 8. 仓库内无
 
 - 无 `requirements.txt`（当前仅标准库）。  
-- 无塔1 `data/sts1/`（待建）。  
+- 无塔1 **遭遇** JSON（`data/sts1/characters/` 已建，见 `data/sts1/README.md`）。  
 - 无 CI。

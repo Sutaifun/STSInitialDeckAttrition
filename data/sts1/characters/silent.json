@@ -1,0 +1,44 @@
+{
+  "id": "silent",
+  "name": "静默猎手",
+  "game": "sts1",
+  "ascension_target": "A20",
+  "starting_deck": [
+    { "card": "strike", "count": 5 },
+    { "card": "defend", "count": 5 },
+    { "card": "neutralize", "count": 1 },
+    { "card": "survivor", "count": 1 },
+    { "card": "ascenders_bane", "count": 1 }
+  ],
+  "deck_note": "12 张常规 + 1 进阶之灾 = 13 张",
+  "relic": {
+    "id": "ring_of_the_snake",
+    "name": "蛇之戒指",
+    "in_combat": true,
+    "note": "每场战斗开始时，额外抽 2 张牌"
+  },
+  "first_fight_model": {
+    "solver_status": "data_only",
+    "draw": {
+      "regular_hand_size": 5,
+      "opening_hand_size": 7,
+      "opening_hand_source": "relic",
+      "deck_includes_ascenders_bane": true,
+      "discard_pile_coupled_to_plays": "bane_only"
+    },
+    "first_fight_scope": {
+      "in_scope": ["同塔2 静默猎手；见 docs/角色战斗机制.md#静默猎手"],
+      "out_of_scope": ["塔1 首场弱怪待录入"],
+      "relic_combat": [
+        { "relic": "ring_of_the_snake", "effect": "opening_draw_bonus", "amount": 2 }
+      ],
+      "path_flags": {
+        "active_curse_discard": {
+          "description": "本回合打出生存者并弃诅咒，且回合末手牌非空",
+          "track_in_export": true
+        }
+      }
+    },
+    "mechanics_doc": "docs/角色战斗机制.md#静默猎手"
+  }
+}

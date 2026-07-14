@@ -1,0 +1,9 @@
+{
+  "id": "strike",
+  "name": "打击",
+  "cost": 1,
+  "type": "attack",
+  "damage": 6,
+  "target": "enemy",
+  "note": "塔1 基础打击；与塔2 数值相同则保持一致"
+}

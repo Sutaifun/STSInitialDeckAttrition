@@ -1,0 +1,57 @@
+{
+  "id": "watcher",
+  "name": "观者",
+  "game": "sts1",
+  "ascension_target": "A20",
+  "starting_deck": [
+    { "card": "strike", "count": 4 },
+    { "card": "defend", "count": 4 },
+    { "card": "eruption", "count": 1 },
+    { "card": "vigilance", "count": 1 },
+    { "card": "ascenders_bane", "count": 1 }
+  ],
+  "stances": {
+    "neutral": "中立",
+    "wrath": "愤怒",
+    "calm": "平静",
+    "divine": "神格"
+  },
+  "relic": {
+    "id": "pure_water",
+    "name": "至纯之水",
+    "in_combat": true,
+    "note": "每场战斗开始时，将一张奇迹放进手牌"
+  },
+  "first_fight_model": {
+    "solver_status": "data_only",
+    "draw": {
+      "regular_hand_size": 5,
+      "opening_hand_size": 5,
+      "opening_hand_source": "default",
+      "deck_includes_ascenders_bane": true
+    },
+    "first_fight_scope": {
+      "in_scope": [
+        "11 选 5",
+        "姿态：中立 / 愤怒 / 平静（神格首场不出现）",
+        "暴怒（进入愤怒）、警惕（进入平静 + 格挡）",
+        "至纯之水：开战将 1 张奇迹置入手牌（0 费、保留、+1 能量、消耗）"
+      ],
+      "out_of_scope": [
+        "塔1 首场弱怪待录入",
+        "神格姿态及相关卡牌",
+        "天人等扩展卡"
+      ],
+      "relic_combat": [
+        {
+          "relic": "pure_water",
+          "effect": "add_card_to_hand",
+          "timing": "combat_start",
+          "card": "miracle",
+          "count": 1
+        }
+      ]
+    },
+    "mechanics_doc": "docs/角色战斗机制.md#观者"
+  }
+}

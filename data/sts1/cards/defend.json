@@ -1,0 +1,8 @@
+{
+  "id": "defend",
+  "name": "防御",
+  "cost": 1,
+  "type": "skill",
+  "block": 5,
+  "target": "self"
+}

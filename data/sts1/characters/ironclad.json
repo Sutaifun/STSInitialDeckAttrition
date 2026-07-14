@@ -1,7 +1,8 @@
 {
   "id": "ironclad",
   "name": "铁甲战士",
-  "game": "sts2",
+  "game": "sts1",
+  "ascension_target": "A20",
   "starting_deck": [
     { "card": "strike", "count": 5 },
     { "card": "defend", "count": 4 },
@@ -12,10 +13,10 @@
     "id": "burning_blood",
     "name": "燃烧之血",
     "in_combat": false,
-    "note": "战斗结束后回复 6 血量；本场模拟不计遗物效果"
+    "note": "战斗结束后回复 6 血量"
   },
   "first_fight_model": {
-    "solver_status": "supported",
+    "solver_status": "data_only",
     "draw": {
       "regular_hand_size": 5,
       "opening_hand_size": 5,
@@ -23,8 +24,8 @@
       "deck_includes_ascenders_bane": true
     },
     "first_fight_scope": {
-      "in_scope": ["标准 11 选 5 抽牌", "打击/防御/痛击/进阶之灾"],
-      "out_of_scope": ["燃烧之血战后回血"],
+      "in_scope": ["与塔2 铁甲同形：11 选 5"],
+      "out_of_scope": ["塔1 首场弱怪遭遇待录入", "燃烧之血"],
       "relic_combat": []
     },
     "mechanics_doc": "docs/角色战斗机制.md#铁甲战士"

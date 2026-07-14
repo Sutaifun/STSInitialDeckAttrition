@@ -1,0 +1,11 @@
+{
+  "id": "zap",
+  "name": "电击",
+  "cost": 1,
+  "type": "skill",
+  "target": "self",
+  "effects": [
+    { "type": "channel", "orb": "lightning", "amount": 1 }
+  ],
+  "note": "生成一个闪电充能球"
+}

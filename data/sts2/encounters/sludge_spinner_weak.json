@@ -1,0 +1,54 @@
+{
+  "id": "sludge_spinner_weak",
+  "name": "污泥旋转者（弱）",
+  "act": 1,
+  "pool": "weak",
+  "biome": "underdocks",
+  "ascension_note": "数值含低进阶与 A10 两档",
+  "monsters": [
+    {
+      "id": "sludge_spinner",
+      "name": "污泥旋转者",
+      "max_hp": {
+        "low": { "min": 37, "max": 39 },
+        "high": { "min": 41, "max": 42 },
+        "solve": "enumerate_each"
+      },
+      "moves": [
+        {
+          "id": "A",
+          "name": "喷油",
+          "intent": "attack",
+          "damage": { "low": 8, "high": 9 },
+          "hits": 1,
+          "effects": [{ "type": "apply_weak", "amount": 1 }]
+        },
+        {
+          "id": "B",
+          "name": "猛撞",
+          "intent": "attack",
+          "damage": { "low": 11, "high": 12 },
+          "hits": 1
+        },
+        {
+          "id": "C",
+          "name": "狂怒",
+          "intent": "attack_buff",
+          "damage": { "low": 6, "high": 7 },
+          "hits": 1,
+          "strength": 3
+        }
+      ],
+      "pattern": {
+        "type": "random_no_repeat",
+        "opening": "A",
+        "cycle": ["A", "B", "C"],
+        "note": "首回合固定喷油；之后三招随机且不可连续相同"
+      }
+    }
+  ],
+  "notes": [
+    "随机意图需定加权或最坏策略口径后方可求解；当前 status: data_only",
+    "项目计划书 §8：敌人随机意图处理方式待定"
+  ]
+}

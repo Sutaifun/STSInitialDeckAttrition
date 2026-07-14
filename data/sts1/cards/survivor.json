@@ -1,0 +1,12 @@
+{
+  "id": "survivor",
+  "name": "生存者",
+  "cost": 1,
+  "type": "skill",
+  "block": 8,
+  "target": "self",
+  "effects": [
+    { "type": "discard", "count": 1 }
+  ],
+  "note": "打出后选手牌弃 1 张；仅当打出后手牌为空时不弃。弃诅咒则虚无不触发。见 docs/角色战斗机制.md#静默猎手"
+}

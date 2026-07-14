@@ -12,31 +12,31 @@
 
 ## 当前进度
 
-试点：**塔2 A10 · 铁甲战士 vs 海洋混混**（HP 47 / 48 / 49）。
+**求解器**（铁甲战士试点）：增量前沿 DP，DFS 打到击杀；塔2 A10 · 铁甲 vs 海洋混混 HP 47/48/49 → P(必伤)=1.0，E[D] ≈ 7.58 / 7.74 / 8.91。
 
-求解器采用「抽牌 DFS + 出牌动态规划」；详见 `docs/求解器设计.md`。
+**数据**：塔2 五角色 + Underdocks 弱怪 4 场 JSON 已录；塔1 四角色 JSON 已录；机制说明见 `docs/角色战斗机制.md`（待用户逐角色细化）。
 
 ## 快速开始
 
 ```bash
 python tests/test_manual.py
-python scripts/run_pilot.py --turns 8 --hp 47 48 49 --progress
+python scripts/run_pilot.py --hp 47 48 49 --dist
+python scripts/run_pilot.py --hp 47 --export data/exports
 ```
 
 需要 Python 3.10+，无第三方依赖。
 
 ## 文档
 
-
-| 文件                               | 说明               |
-| -------------------------------- | ---------------- |
-| [AGENTS.md](AGENTS.md)           | 项目结构与 Agent 上手指南 |
-| [docs/项目计划书.md](docs/项目计划书.md)   | 目标与范围            |
-| [docs/游戏数据格式.md](docs/游戏数据格式.md) | 游戏数据 JSON 格式     |
-| [docs/求解器设计.md](docs/求解器设计.md)   | 求解器技术方案          |
-
-
-
+| 文件 | 说明 |
+|------|------|
+| [AGENTS.md](AGENTS.md) | 项目结构与 Agent 上手指南 |
+| [docs/项目计划书.md](docs/项目计划书.md) | 目标与范围 |
+| [docs/游戏机制.md](docs/游戏机制.md) | 通用战斗规则 |
+| [docs/角色战斗机制.md](docs/角色战斗机制.md) | 六角色首场机制、译名 |
+| [docs/游戏数据格式.md](docs/游戏数据格式.md) | JSON schema |
+| [docs/抽牌枚举协议.md](docs/抽牌枚举协议.md) | 抽牌组合与协议档 |
+| [docs/求解器设计.md](docs/求解器设计.md) | 求解器技术方案 |
 
 ## 许可
 

@@ -1,0 +1,11 @@
+{
+  "id": "neutralize",
+  "name": "中和",
+  "cost": 0,
+  "type": "attack",
+  "damage": 3,
+  "target": "enemy",
+  "effects": [
+    { "type": "apply_weak", "amount": 1, "order": "after_damage" }
+  ]
+}

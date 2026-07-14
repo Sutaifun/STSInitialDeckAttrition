@@ -1,0 +1,12 @@
+{
+  "id": "survivor",
+  "name": "生存者",
+  "cost": 1,
+  "type": "skill",
+  "block": 8,
+  "target": "self",
+  "effects": [
+    { "type": "discard", "count": 1 }
+  ],
+  "note": "打出后弃 1 张。首场仅「弃诅咒」改变牌池；弃其它牌与打出/留手等价。弃诅咒则虚无不触发。"
+}

@@ -1,0 +1,46 @@
+{
+  "id": "defect",
+  "name": "故障机器人",
+  "game": "sts1",
+  "ascension_target": "A20",
+  "starting_deck": [
+    { "card": "strike", "count": 4 },
+    { "card": "defend", "count": 4 },
+    { "card": "zap", "count": 1 },
+    { "card": "dualcast", "count": 1 },
+    { "card": "ascenders_bane", "count": 1 }
+  ],
+  "orb_slots": 3,
+  "relic": {
+    "id": "cracked_core",
+    "name": "破损核心",
+    "in_combat": true,
+    "note": "每场战斗开始时，生成一个闪电充能球"
+  },
+  "first_fight_model": {
+    "solver_status": "data_only",
+    "draw": {
+      "regular_hand_size": 5,
+      "opening_hand_size": 5,
+      "opening_hand_source": "default",
+      "deck_includes_ascenders_bane": true
+    },
+    "first_fight_scope": {
+      "in_scope": [
+        "11 选 5",
+        "充能球（首场仅闪电）、破损核心、电击、双重释放"
+      ],
+      "out_of_scope": ["塔1 首场弱怪待录入"],
+      "relic_combat": [
+        {
+          "relic": "cracked_core",
+          "effect": "channel",
+          "timing": "combat_start",
+          "orb": "lightning",
+          "amount": 1
+        }
+      ]
+    },
+    "mechanics_doc": "docs/角色战斗机制.md#故障机器人"
+  }
+}

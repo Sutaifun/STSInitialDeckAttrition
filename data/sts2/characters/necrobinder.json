@@ -1,0 +1,59 @@
+{
+  "id": "necrobinder",
+  "name": "亡灵契约师",
+  "game": "sts2",
+  "starting_deck": [
+    { "card": "strike", "count": 4 },
+    { "card": "defend", "count": 4 },
+    { "card": "bodyguard", "count": 1 },
+    { "card": "unleash", "count": 1 },
+    { "card": "ascenders_bane", "count": 1 }
+  ],
+  "relic": {
+    "id": "bound_phylactery",
+    "name": "缚魂命匣",
+    "in_combat": true,
+    "note": "每个回合开始时，召唤 1"
+  },
+  "companion": {
+    "id": "osty",
+    "name": "奥斯提",
+    "combat_start_hp": 1,
+    "note": "替玩家承受指向玩家的攻击；死亡后下回合初可被召唤复活"
+  },
+  "keywords": {
+    "summon": "召唤X：以 X 生命值召唤奥斯提；若奥斯提已被召唤，则将其最大生命值提升 X 点（当前血量同步提升）"
+  },
+  "first_fight_model": {
+    "solver_status": "data_only",
+    "draw": {
+      "regular_hand_size": 5,
+      "opening_hand_size": 5,
+      "opening_hand_source": "default",
+      "deck_includes_ascenders_bane": true
+    },
+    "first_fight_scope": {
+      "in_scope": [
+        "11 选 5 抽牌",
+        "奥斯提 HP 与替玩家挡伤",
+        "召唤（护卫 +5，缚魂命匣每回合初 +1）",
+        "出击：6 + 奥斯提当前 HP"
+      ],
+      "out_of_scope": [
+        "灾厄",
+        "坟场、灵魂",
+        "大量死灵专属卡"
+      ],
+      "relic_combat": [
+        {
+          "relic": "bound_phylactery",
+          "effect": "summon",
+          "timing": "turn_start",
+          "amount": 1,
+          "note": "每个回合开始时，召唤 1"
+        }
+      ]
+    },
+    "mechanics_doc": "docs/角色战斗机制.md#亡灵契约师"
+  }
+}

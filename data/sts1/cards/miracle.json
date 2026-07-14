@@ -1,0 +1,12 @@
+{
+  "id": "miracle",
+  "name": "奇迹",
+  "cost": 0,
+  "type": "skill",
+  "target": "self",
+  "keywords": ["retain", "exhaust"],
+  "effects": [
+    { "type": "gain_energy", "amount": 1 }
+  ],
+  "note": "保留；获得 1 能量；消耗。由至纯之水在战斗开始时置入手牌"
+}

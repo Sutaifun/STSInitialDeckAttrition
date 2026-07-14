@@ -1,0 +1,15 @@
+{
+  "id": "bash",
+  "name": "痛击",
+  "cost": 2,
+  "type": "attack",
+  "damage": 8,
+  "target": "enemy",
+  "effects": [
+    {
+      "type": "apply_vulnerable",
+      "amount": 2,
+      "order": "after_damage"
+    }
+  ]
+}

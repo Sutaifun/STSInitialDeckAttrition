@@ -1,0 +1,12 @@
+{
+  "id": "bodyguard",
+  "name": "护卫",
+  "cost": 1,
+  "type": "skill",
+  "target": "self",
+  "keywords": ["summon"],
+  "effects": [
+    { "type": "summon", "amount": 5 }
+  ],
+  "note": "召唤5：以 5 生命值召唤奥斯提，或将其最大生命值提升 5（当前血量同步提升）"
+}

@@ -1,0 +1,64 @@
+{
+  "id": "silent",
+  "name": "静默猎手",
+  "game": "sts2",
+  "starting_deck": [
+    { "card": "strike", "count": 5 },
+    { "card": "defend", "count": 5 },
+    { "card": "neutralize", "count": 1 },
+    { "card": "survivor", "count": 1 },
+    { "card": "ascenders_bane", "count": 1 }
+  ],
+  "deck_note": "12 张常规 + 1 进阶之灾 = 13 张",
+  "relic": {
+    "id": "ring_of_the_snake",
+    "name": "蛇之戒指",
+    "in_combat": true,
+    "note": "每场战斗开始时，额外抽 2 张牌"
+  },
+  "draw_cycle": {
+    "opening": { "pool_size": 13, "draw": 7 },
+    "regular_hand_size": 5,
+    "after_bane_exhausted": {
+      "pool_size": 12,
+      "steady_state": ["7_choose_5", "10_choose_3"],
+      "first_shuffle_anchor": { "hand": 5, "draw_pile": 7 }
+    },
+    "with_bane_in_pool": "per_state_enumeration"
+  },
+  "first_fight_model": {
+    "solver_status": "data_only",
+    "draw": {
+      "regular_hand_size": 5,
+      "opening_hand_size": 7,
+      "opening_hand_source": "relic",
+      "deck_includes_ascenders_bane": true,
+      "discard_pile_coupled_to_plays": "bane_only"
+    },
+    "first_fight_scope": {
+      "in_scope": [
+        "13 张；首回合 13 选 7，之后摸 5",
+        "诅咒消耗后：12 张稳态 7 选 5 ↔ 10 选 3；首次洗牌锚点手 5 / 抽 7",
+        "诅咒未消耗或在弃牌堆：按状态分情况枚举",
+        "中和；生存者",
+        "仅弃诅咒改变牌池；弃非诅咒无差别",
+        "不剪枝主动弃诅咒；active_curse_discard 标记"
+      ],
+      "out_of_scope": ["奇巧", "毒、刀刃", "蛇之戒指以外遗物"],
+      "relic_combat": [
+        {
+          "relic": "ring_of_the_snake",
+          "effect": "opening_draw_bonus",
+          "amount": 2
+        }
+      ],
+      "path_flags": {
+        "active_curse_discard": {
+          "description": "本回合打出生存者并弃诅咒，且回合末手牌非空",
+          "track_in_export": true
+        }
+      }
+    },
+    "mechanics_doc": "docs/角色战斗机制.md#静默猎手"
+  }
+}

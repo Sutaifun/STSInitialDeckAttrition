@@ -1,0 +1,9 @@
+{
+  "id": "unleash",
+  "name": "出击",
+  "cost": 1,
+  "type": "attack",
+  "damage": 6,
+  "target": "enemy",
+  "note": "奥斯提造成 6 点基础伤害，并额外造成等于奥斯提当前生命值的伤害"
+}

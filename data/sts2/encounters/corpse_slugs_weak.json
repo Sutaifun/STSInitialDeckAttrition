@@ -1,0 +1,60 @@
+{
+  "id": "corpse_slugs_weak",
+  "name": "腐尸蛞蝓（弱）",
+  "act": 1,
+  "pool": "weak",
+  "biome": "underdocks",
+  "ascension_note": "数值含低进阶与 A10 两档",
+  "monsters": [
+    {
+      "id": "corpse_slug",
+      "name": "腐尸蛞蝓",
+      "count": 2,
+      "pattern_offset": [0, 1],
+      "max_hp": {
+        "low": { "min": 25, "max": 27 },
+        "high": { "min": 27, "max": 29 },
+        "solve": "enumerate_each"
+      },
+      "powers": [
+        {
+          "id": "ravenous",
+          "name": "贪食",
+          "type": "intensity",
+          "amount": { "low": 4, "high": 5 },
+          "note": "有敌人死亡时立即吞噬，眩晕并获得力量；首场多怪模拟待实现"
+        }
+      ],
+      "moves": [
+        {
+          "id": "A",
+          "name": "鞭击",
+          "intent": "attack",
+          "damage": 3,
+          "hits": 2
+        },
+        {
+          "id": "B",
+          "name": "猛扑",
+          "intent": "attack",
+          "damage": { "low": 8, "high": 9 },
+          "hits": 1
+        },
+        {
+          "id": "C",
+          "name": "黏液",
+          "intent": "debuff",
+          "effects": [{ "type": "apply_frail", "amount": 2 }]
+        }
+      ],
+      "pattern": {
+        "opening": "A",
+        "cycle": ["A", "B", "C"]
+      }
+    }
+  ],
+  "notes": [
+    "两只蛞蝓按 cycle 错开起手（pattern_offset 0 与 1）",
+    "贪食（Ravenous）在多怪击杀时改变力量；求解器 status: data_only"
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "id": "falling_star",
+  "name": "陨星",
+  "cost": 0,
+  "star_cost": 2,
+  "type": "attack",
+  "damage": 8,
+  "target": "enemy",
+  "effects": [
+    { "type": "apply_weak", "amount": 1, "order": "after_damage" },
+    { "type": "apply_vulnerable", "amount": 1, "order": "after_damage" }
+  ]
+}

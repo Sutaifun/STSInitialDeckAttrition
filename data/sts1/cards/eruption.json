@@ -1,0 +1,11 @@
+{
+  "id": "eruption",
+  "name": "暴怒",
+  "cost": 2,
+  "type": "attack",
+  "damage": 9,
+  "target": "enemy",
+  "effects": [
+    { "type": "enter_stance", "stance": "wrath", "stance_name": "愤怒" }
+  ]
+}
