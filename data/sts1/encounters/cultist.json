@@ -1,0 +1,53 @@
+{
+  "id": "cultist",
+  "name": "邪教徒",
+  "act": 1,
+  "pool": "weak",
+  "biome": "exordium",
+  "ascension_note": "数值含低进阶(A0)与 A20 两档；ritual low=3 high=5",
+  "monsters": [
+    {
+      "id": "cultist",
+      "name": "邪教徒",
+      "max_hp": {
+        "low": {
+          "min": 48,
+          "max": 54
+        },
+        "high": {
+          "min": 50,
+          "max": 56
+        },
+        "solve": "enumerate_each"
+      },
+      "moves": [
+        {
+          "id": "A",
+          "name": "咒文",
+          "intent": "buff",
+          "ritual": {
+            "low": 3,
+            "high": 5
+          },
+          "note": "A0=3; A2–16=4; A17+=5。A20 用 high=5"
+        },
+        {
+          "id": "B",
+          "name": "黑暗打击",
+          "intent": "attack",
+          "damage": 6,
+          "hits": 1
+        }
+      ],
+      "pattern": {
+        "opening": "A",
+        "cycle": [
+          "B"
+        ]
+      }
+    }
+  ],
+  "notes": [
+    "仪式：每回合开始（含获得当回合之后）获得等量力量"
+  ]
+}

@@ -1,0 +1,12 @@
+{
+  "id": "slimed",
+  "name": "粘液",
+  "cost": 1,
+  "type": "status",
+  "target": "self",
+  "keywords": [
+    "exhaust"
+  ],
+  "effects": [],
+  "note": "打出后消耗；无其他效果（塔1）"
+}

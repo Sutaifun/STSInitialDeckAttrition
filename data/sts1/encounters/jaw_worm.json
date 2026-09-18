@@ -1,0 +1,89 @@
+{
+  "id": "jaw_worm",
+  "name": "大颚虫",
+  "act": 1,
+  "pool": "weak",
+  "biome": "exordium",
+  "ascension_note": "数值含低进阶(A0)与 A20 两档",
+  "monsters": [
+    {
+      "id": "jaw_worm",
+      "name": "大颚虫",
+      "max_hp": {
+        "low": {
+          "min": 40,
+          "max": 44
+        },
+        "high": {
+          "min": 42,
+          "max": 46
+        },
+        "solve": "enumerate_each"
+      },
+      "moves": [
+        {
+          "id": "chomp",
+          "name": "啃咬",
+          "intent": "attack",
+          "damage": {
+            "low": 11,
+            "high": 12
+          },
+          "hits": 1
+        },
+        {
+          "id": "bellow",
+          "name": "咆哮",
+          "intent": "defend_buff",
+          "strength": {
+            "low": 3,
+            "high": 5
+          },
+          "block": {
+            "low": 6,
+            "high": 9
+          },
+          "note": "A0:3力6盾; A2–16:4力6盾; A17+:5力9盾 → A20 用 5/9"
+        },
+        {
+          "id": "thrash",
+          "name": "猛击",
+          "intent": "attack_defend",
+          "damage": 7,
+          "hits": 1,
+          "block": 5
+        }
+      ],
+      "pattern": {
+        "opening": "chomp",
+        "type": "weighted_after",
+        "transitions": {
+          "chomp": {
+            "bellow": 0.59,
+            "thrash": 0.41
+          },
+          "bellow": {
+            "thrash": 0.56,
+            "chomp": 0.44
+          },
+          "thrash": {
+            "bellow": 0.45,
+            "thrash": 0.3,
+            "chomp": 0.25
+          },
+          "thrash_after_two_thrash": {
+            "bellow": 0.64,
+            "chomp": 0.36
+          }
+        },
+        "constraints": [
+          "Thrash 不可连续三次；若已连续两次 Thrash，则下一击仅 64% Bellow / 36% Chomp"
+        ]
+      }
+    }
+  ],
+  "notes": [
+    "求解器暂 status: data_only（加权随机 pattern 未接线）",
+    "AI / 转移概率按 wiki.gg Jaw Worm 页 2026-09 文本"
+  ]
+}
