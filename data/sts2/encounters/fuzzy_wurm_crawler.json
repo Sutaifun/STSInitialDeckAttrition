@@ -1,0 +1,56 @@
+{
+  "id": "fuzzy_wurm_crawler",
+  "name": "毛绒蠕虫",
+  "act": 1,
+  "pool": "weak",
+  "biome": "overgrowth",
+  "ascension_note": "数值含低进阶与 A10 两档",
+  "monsters": [
+    {
+      "id": "fuzzy_wurm_crawler",
+      "name": "毛绒蠕虫",
+      "max_hp": {
+        "low": {
+          "min": 55,
+          "max": 57
+        },
+        "high": {
+          "min": 58,
+          "max": 59
+        },
+        "solve": "enumerate_each"
+      },
+      "moves": [
+        {
+          "id": "acid_goop",
+          "name": "Acid Goop",
+          "intent": "attack",
+          "damage": {
+            "low": 4,
+            "high": 6
+          },
+          "hits": 1
+        },
+        {
+          "id": "inhale",
+          "name": "Inhale",
+          "intent": "buff",
+          "strength": 7
+        }
+      ],
+      "pattern": {
+        "opening": "acid_goop",
+        "cycle": [
+          "acid_goop",
+          "inhale",
+          "acid_goop"
+        ],
+        "note": "固定三回合循环 Acid Goop → Inhale → Acid Goop →（重复）；力量跨循环累积"
+      }
+    }
+  ],
+  "notes": [
+    "力量跨循环累积（每完成一次 Inhale +7）",
+    "求解器 status: data_only"
+  ]
+}

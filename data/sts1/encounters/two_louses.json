@@ -1,0 +1,210 @@
+{
+  "id": "two_louses",
+  "name": "双虱",
+  "act": 1,
+  "pool": "weak",
+  "biome": "exordium",
+  "ascension_note": "数值含低进阶(A0)与 A20 两档；Curl Up / Bite 开战随机用 enumerate_each",
+  "composition": {
+    "slots": 2,
+    "each_slot": {
+      "possible_kinds": [
+        "red_louse",
+        "green_louse"
+      ],
+      "weights": {
+        "red_louse": 0.5,
+        "green_louse": 0.5
+      }
+    },
+    "variants": [
+      "RR",
+      "RG",
+      "GR",
+      "GG"
+    ],
+    "note": "两只各独立 50% 红/绿；RG 与 GR 按槽位区分"
+  },
+  "monster_kinds": {
+    "red_louse": {
+      "id": "red_louse",
+      "name": "红虱",
+      "max_hp": {
+        "low": {
+          "min": 10,
+          "max": 15
+        },
+        "high": {
+          "min": 11,
+          "max": 16
+        },
+        "solve": "enumerate_each"
+      },
+      "powers": [
+        {
+          "id": "curl_up",
+          "name": "蜷缩",
+          "type": "block_on_hit",
+          "amount": {
+            "low": {
+              "min": 3,
+              "max": 7
+            },
+            "high": {
+              "min": 9,
+              "max": 12
+            },
+            "solve": "enumerate_each",
+            "note": "开战随机锁定；A7 为 4–8，A17+/A20 用 9–12"
+          }
+        }
+      ],
+      "moves": [
+        {
+          "id": "bite",
+          "name": "撕咬",
+          "intent": "attack",
+          "damage": {
+            "low": {
+              "min": 5,
+              "max": 7
+            },
+            "high": {
+              "min": 6,
+              "max": 8
+            },
+            "solve": "enumerate_each",
+            "note": "开战锁定伤害；A2+ 用 high"
+          },
+          "hits": 1
+        },
+        {
+          "id": "grow",
+          "name": "成长",
+          "intent": "buff",
+          "strength": {
+            "low": 3,
+            "high": 4
+          },
+          "note": "A17+ +4"
+        }
+      ],
+      "pattern": {
+        "type": "weighted_after",
+        "weights": {
+          "grow": 0.25,
+          "bite": 0.75
+        },
+        "constraints": [
+          "不可同一招连续三次",
+          "A17+ Grow 不可连续两次"
+        ]
+      }
+    },
+    "green_louse": {
+      "id": "green_louse",
+      "name": "绿虱",
+      "max_hp": {
+        "low": {
+          "min": 11,
+          "max": 17
+        },
+        "high": {
+          "min": 12,
+          "max": 18
+        },
+        "solve": "enumerate_each"
+      },
+      "powers": [
+        {
+          "id": "curl_up",
+          "name": "蜷缩",
+          "type": "block_on_hit",
+          "amount": {
+            "low": {
+              "min": 3,
+              "max": 7
+            },
+            "high": {
+              "min": 9,
+              "max": 12
+            },
+            "solve": "enumerate_each",
+            "note": "开战随机锁定；与红虱相同；A20 用 9–12"
+          }
+        }
+      ],
+      "moves": [
+        {
+          "id": "bite",
+          "name": "撕咬",
+          "intent": "attack",
+          "damage": {
+            "low": {
+              "min": 5,
+              "max": 7
+            },
+            "high": {
+              "min": 6,
+              "max": 8
+            },
+            "solve": "enumerate_each",
+            "note": "开战锁定伤害；与红虱相同"
+          },
+          "hits": 1
+        },
+        {
+          "id": "spit_web",
+          "name": "吐网",
+          "intent": "debuff",
+          "effects": [
+            {
+              "type": "apply_weak",
+              "amount": 2
+            }
+          ]
+        }
+      ],
+      "pattern": {
+        "type": "weighted_after",
+        "weights": {
+          "spit_web": 0.25,
+          "bite": 0.75
+        },
+        "constraints": [
+          "不可同一招连续三次",
+          "A17+ Spit Web 不可连续两次"
+        ]
+      }
+    }
+  },
+  "monsters": [
+    {
+      "slot": 0,
+      "possible_kinds": [
+        "red_louse",
+        "green_louse"
+      ],
+      "weights": {
+        "red_louse": 0.5,
+        "green_louse": 0.5
+      }
+    },
+    {
+      "slot": 1,
+      "possible_kinds": [
+        "red_louse",
+        "green_louse"
+      ],
+      "weights": {
+        "red_louse": 0.5,
+        "green_louse": 0.5
+      }
+    }
+  ],
+  "notes": [
+    "各 50% 红/绿 → 组合 RR / RG / GR / GG",
+    "Curl Up 与 Bite 伤害均为开战随机锁定；求解器可用 enumerate_each",
+    "求解器 status: data_only（多怪 + 随机种类 + 加权 AI）"
+  ]
+}

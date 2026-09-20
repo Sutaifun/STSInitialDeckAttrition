@@ -1,0 +1,17 @@
+{
+  "id": "slimed",
+  "name": "粘液",
+  "cost": 1,
+  "type": "status",
+  "target": "self",
+  "keywords": [
+    "exhaust"
+  ],
+  "effects": [
+    {
+      "type": "draw",
+      "amount": 1
+    }
+  ],
+  "note": "抽 1 张牌，然后消耗（塔2；引擎 draw 接线待后续）"
+}

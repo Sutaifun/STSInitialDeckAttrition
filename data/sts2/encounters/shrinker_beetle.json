@@ -1,0 +1,73 @@
+{
+  "id": "shrinker_beetle",
+  "name": "收缩甲虫",
+  "act": 1,
+  "pool": "weak",
+  "biome": "overgrowth",
+  "ascension_note": "数值含低进阶与 A10 两档",
+  "monsters": [
+    {
+      "id": "shrinker_beetle",
+      "name": "收缩甲虫",
+      "max_hp": {
+        "low": {
+          "min": 38,
+          "max": 40
+        },
+        "high": {
+          "min": 40,
+          "max": 42
+        },
+        "solve": "enumerate_each"
+      },
+      "moves": [
+        {
+          "id": "shrinker",
+          "name": "Shrinker",
+          "intent": "debuff",
+          "effects": [
+            {
+              "type": "apply_shrink",
+              "damage_multiplier": 0.7,
+              "clears_on_source_death": true,
+              "note": "攻击伤害 -30%；施加者死亡时移除；奥斯提不受影响"
+            }
+          ]
+        },
+        {
+          "id": "chomp",
+          "name": "Chomp",
+          "intent": "attack",
+          "damage": {
+            "low": 7,
+            "high": 8
+          },
+          "hits": 1
+        },
+        {
+          "id": "stomp",
+          "name": "Stomp",
+          "intent": "attack",
+          "damage": {
+            "low": 13,
+            "high": 14
+          },
+          "hits": 1
+        }
+      ],
+      "pattern": {
+        "opening": "shrinker",
+        "cycle": [
+          "chomp",
+          "stomp"
+        ],
+        "note": "起手 Shrinker，其后交替 Chomp ↔ Stomp"
+      }
+    }
+  ],
+  "notes": [
+    "Shrink：攻击伤害 -30%，甲虫死亡时清除；奥斯提不受影响",
+    "Debuffs 总表另有「3 回合」表述（可能指药水 Beetle Juice）——争议搁置，首场按死亡清除录入",
+    "求解器 status: data_only"
+  ]
+}

@@ -1,0 +1,238 @@
+{
+  "id": "slimes_weak",
+  "name": "软泥组合（弱）",
+  "act": 1,
+  "pool": "weak",
+  "biome": "overgrowth",
+  "ascension_note": "数值含低进阶与 A10 两档",
+  "composition": {
+    "fixed": [
+      "leaf_slime_s",
+      "twig_slime_s"
+    ],
+    "medium": {
+      "possible_kinds": [
+        "leaf_slime_m",
+        "twig_slime_m"
+      ],
+      "weights": {
+        "leaf_slime_m": 0.5,
+        "twig_slime_m": 0.5
+      },
+      "note": "wiki 仅 random medium slime，权重未写 → 暂 50/50"
+    },
+    "order": [
+      "leaf_slime_s",
+      "medium",
+      "twig_slime_s"
+    ],
+    "note": "1×叶S + 1×随机中型（叶M或枝M）+ 1×枝S"
+  },
+  "monster_kinds": {
+    "leaf_slime_s": {
+      "id": "leaf_slime_s",
+      "name": "叶软泥(S)",
+      "max_hp": {
+        "low": {
+          "min": 11,
+          "max": 15
+        },
+        "high": {
+          "min": 12,
+          "max": 16
+        },
+        "solve": "enumerate_each"
+      },
+      "moves": [
+        {
+          "id": "tackle",
+          "name": "Tackle",
+          "intent": "attack",
+          "damage": {
+            "low": 3,
+            "high": 4
+          },
+          "hits": 1
+        },
+        {
+          "id": "goop",
+          "name": "Goop",
+          "intent": "status",
+          "effects": [
+            {
+              "type": "add_status_to_discard",
+              "card": "slimed",
+              "amount": 1
+            }
+          ]
+        }
+      ],
+      "pattern": {
+        "type": "random_no_repeat",
+        "cycle": [
+          "tackle",
+          "goop"
+        ],
+        "note": "随机 Tackle 或 Goop；不可同招连用"
+      }
+    },
+    "leaf_slime_m": {
+      "id": "leaf_slime_m",
+      "name": "叶软泥(M)",
+      "max_hp": {
+        "low": {
+          "min": 32,
+          "max": 35
+        },
+        "high": {
+          "min": 33,
+          "max": 36
+        },
+        "solve": "enumerate_each"
+      },
+      "moves": [
+        {
+          "id": "sticky_shot",
+          "name": "Sticky Shot",
+          "intent": "status",
+          "effects": [
+            {
+              "type": "add_status_to_discard",
+              "card": "slimed",
+              "amount": 2
+            }
+          ]
+        },
+        {
+          "id": "clump_shot",
+          "name": "Clump Shot",
+          "intent": "attack",
+          "damage": {
+            "low": 8,
+            "high": 9
+          },
+          "hits": 1
+        }
+      ],
+      "pattern": {
+        "opening": "sticky_shot",
+        "cycle": [
+          "clump_shot",
+          "sticky_shot"
+        ],
+        "note": "起手 Sticky Shot（+2粘液）；其后交替 Clump Shot 与 Sticky Shot"
+      }
+    },
+    "twig_slime_s": {
+      "id": "twig_slime_s",
+      "name": "枝软泥(S)",
+      "max_hp": {
+        "low": {
+          "min": 7,
+          "max": 11
+        },
+        "high": {
+          "min": 8,
+          "max": 12
+        },
+        "solve": "enumerate_each"
+      },
+      "moves": [
+        {
+          "id": "tackle",
+          "name": "Tackle",
+          "intent": "attack",
+          "damage": {
+            "low": 4,
+            "high": 5
+          },
+          "hits": 1
+        }
+      ],
+      "pattern": {
+        "opening": "tackle",
+        "cycle": [
+          "tackle"
+        ]
+      }
+    },
+    "twig_slime_m": {
+      "id": "twig_slime_m",
+      "name": "枝软泥(M)",
+      "max_hp": {
+        "low": {
+          "min": 26,
+          "max": 28
+        },
+        "high": {
+          "min": 27,
+          "max": 29
+        },
+        "solve": "enumerate_each"
+      },
+      "moves": [
+        {
+          "id": "sticky_shot",
+          "name": "Sticky Shot",
+          "intent": "status",
+          "effects": [
+            {
+              "type": "add_status_to_discard",
+              "card": "slimed",
+              "amount": 1
+            }
+          ]
+        },
+        {
+          "id": "chomp",
+          "name": "Chomp",
+          "intent": "attack",
+          "damage": {
+            "low": 11,
+            "high": 12
+          },
+          "hits": 1
+        }
+      ],
+      "pattern": {
+        "opening": "sticky_shot",
+        "type": "weighted_after",
+        "weights": {
+          "chomp": 0.67,
+          "sticky_shot": 0.33
+        },
+        "constraints": [
+          "Sticky Shot 不可连用"
+        ],
+        "note": "起手 Sticky Shot（+1粘液）；其后 Chomp 67% 或 Sticky Shot 33%"
+      }
+    }
+  },
+  "monsters": [
+    {
+      "slot": 0,
+      "kind": "leaf_slime_s"
+    },
+    {
+      "slot": 1,
+      "role": "medium",
+      "possible_kinds": [
+        "leaf_slime_m",
+        "twig_slime_m"
+      ],
+      "weights": {
+        "leaf_slime_m": 0.5,
+        "twig_slime_m": 0.5
+      }
+    },
+    {
+      "slot": 2,
+      "kind": "twig_slime_s"
+    }
+  ],
+  "notes": [
+    "中型 50/50：叶M / 枝M",
+    "粘液：叶S Goop +1；叶M Sticky Shot +2；枝M Sticky Shot +1（均进弃牌堆）",
+    "求解器 status: data_only（多怪+随机中型+粘液）"
+  ]
+}

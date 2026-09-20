@@ -1,0 +1,71 @@
+{
+  "id": "nibbit",
+  "name": "Nibbit",
+  "act": 1,
+  "pool": "weak",
+  "biome": "overgrowth",
+  "ascension_note": "数值含低进阶与 A10 两档",
+  "monsters": [
+    {
+      "id": "nibbit",
+      "name": "Nibbit",
+      "max_hp": {
+        "low": {
+          "min": 42,
+          "max": 46
+        },
+        "high": {
+          "min": 44,
+          "max": 48
+        },
+        "solve": "enumerate_each"
+      },
+      "moves": [
+        {
+          "id": "A",
+          "name": "Butt",
+          "intent": "attack",
+          "damage": {
+            "low": 12,
+            "high": 13
+          },
+          "hits": 1
+        },
+        {
+          "id": "B",
+          "name": "Hesitant Slice",
+          "intent": "attack_defend",
+          "damage": {
+            "low": 6,
+            "high": 7
+          },
+          "hits": 1,
+          "block": {
+            "low": 5,
+            "high": 6
+          }
+        },
+        {
+          "id": "C",
+          "name": "Hiss",
+          "intent": "buff",
+          "strength": {
+            "low": 2,
+            "high": 3
+          }
+        }
+      ],
+      "pattern": {
+        "opening": "A",
+        "cycle": [
+          "A",
+          "B",
+          "C"
+        ]
+      }
+    }
+  ],
+  "notes": [
+    "独行弱遭遇：起手 Butt，其后固定循环 Butt → Hesitant Slice → Hiss"
+  ]
+}

@@ -10,7 +10,7 @@
       "id": "toadpole",
       "name": "蝌蚪",
       "count": 2,
-      "pattern_offset": [2, 0],
+      "pattern_offset": [1, 0],
       "max_hp": {
         "low": { "min": 21, "max": 25 },
         "high": { "min": 22, "max": 26 },
@@ -55,8 +55,8 @@
     }
   ],
   "notes": [
-    "弱遭遇：前排蝌蚪（pattern_offset=0）首回合改为尖刺化，即起手 B 而非 cycle 默认 A",
-    "此处用 pattern_offset [2,0] 表示后排仍按 Whirl→Spiken→Spike 循环，前排起手为 B",
+    "cycle: A旋转 → B尖刺化 → C吐刺；pattern_offset 为 cycle 起始下标",
+    "弱遭遇：前排 offset=1 起手 B（尖刺化），后排 offset=0 起手 A（旋转）；已由站长实机 A10 核对（v0.107.1）",
     "荆棘反伤对最优出牌有影响；求解器 status: data_only"
   ]
 }

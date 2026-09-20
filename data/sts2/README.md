@@ -13,14 +13,20 @@
 
 ## Overgrowth（蔓生区）
 
-| 遭遇 | 说明 | 状态 |
-|------|------|------|
-| Nibbit 单怪 | 单只 Nibbit | **待录入** |
-| 软泥组合 | 1 小叶软泥 + 1 随机中型软泥 + 1 小枝软泥 | **待录入** |
-| Shrinker Beetle | 单只收缩甲虫 | **待录入** |
-| Fuzzy Wurm Crawler | 单只毛虫 | **待录入** |
+| 遭遇文件 | 说明 | 求解器 |
+|----------|------|--------|
+| `encounters/nibbit.json` | 单只 Nibbit | data_only |
+| `encounters/slimes_weak.json` | 1 小叶软泥 + 1 随机中型软泥 + 1 小枝软泥 | data_only |
+| `encounters/shrinker_beetle.json` | 单只收缩甲虫 | data_only |
+| `encounters/fuzzy_wurm_crawler.json` | 单只毛绒蠕虫 | data_only |
 
-数值来源： [Slay the Spire 2 Wiki](https://slaythespire.wiki.gg/wiki/Slay_the_Spire_2:Overgrowth) 及各怪物页。录入后在本表更新路径。
+## 卡牌
+
+| 文件 | 说明 |
+|------|------|
+| `cards/slimed.json` | 粘液：抽 1 张牌，然后消耗（引擎 draw 接线待后续） |
+
+数值来源： [Slay the Spire 2 Wiki](https://slaythespire.wiki.gg/wiki/Slay_the_Spire_2:Overgrowth) 及各怪物页。
 
 ## 角色
 

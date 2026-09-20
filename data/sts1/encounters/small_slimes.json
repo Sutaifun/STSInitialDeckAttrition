@@ -1,0 +1,265 @@
+{
+  "id": "small_slimes",
+  "name": "小史莱姆",
+  "act": 1,
+  "pool": "weak",
+  "biome": "exordium",
+  "ascension_note": "数值含低进阶(A0)与 A20 两档",
+  "composition": {
+    "variants": [
+      {
+        "id": "A",
+        "weight": 0.5,
+        "monsters": [
+          "spike_slime_m",
+          "acid_slime_s"
+        ],
+        "note": "尖刺M + 酸液S"
+      },
+      {
+        "id": "B",
+        "weight": 0.5,
+        "monsters": [
+          "acid_slime_m",
+          "spike_slime_s"
+        ],
+        "note": "酸液M + 尖刺S"
+      }
+    ],
+    "note": "wiki 仅 Either A or B，权重未写 → 暂 50/50"
+  },
+  "monster_kinds": {
+    "spike_slime_m": {
+      "id": "spike_slime_m",
+      "name": "尖刺史莱姆(M)",
+      "max_hp": {
+        "low": {
+          "min": 28,
+          "max": 32
+        },
+        "high": {
+          "min": 29,
+          "max": 34
+        },
+        "solve": "enumerate_each"
+      },
+      "moves": [
+        {
+          "id": "flame_tackle",
+          "name": "火焰冲撞",
+          "intent": "attack",
+          "damage": {
+            "low": 8,
+            "high": 10
+          },
+          "hits": 1,
+          "effects": [
+            {
+              "type": "add_status_to_discard",
+              "card": "slimed",
+              "amount": 1
+            }
+          ]
+        },
+        {
+          "id": "lick",
+          "name": "舔舐",
+          "intent": "debuff",
+          "effects": [
+            {
+              "type": "apply_frail",
+              "amount": 1
+            }
+          ]
+        }
+      ],
+      "pattern": {
+        "type": "weighted_after",
+        "weights": {
+          "flame_tackle": 0.3,
+          "lick": 0.7
+        },
+        "constraints": [
+          "不可同一招连续三次",
+          "A17+ 不可 Lick 连续两次"
+        ]
+      }
+    },
+    "spike_slime_s": {
+      "id": "spike_slime_s",
+      "name": "尖刺史莱姆(S)",
+      "max_hp": {
+        "low": {
+          "min": 10,
+          "max": 14
+        },
+        "high": {
+          "min": 11,
+          "max": 15
+        },
+        "solve": "enumerate_each"
+      },
+      "moves": [
+        {
+          "id": "tackle",
+          "name": "冲撞",
+          "intent": "attack",
+          "damage": {
+            "low": 5,
+            "high": 6
+          },
+          "hits": 1
+        }
+      ],
+      "pattern": {
+        "opening": "tackle",
+        "cycle": [
+          "tackle"
+        ]
+      }
+    },
+    "acid_slime_m": {
+      "id": "acid_slime_m",
+      "name": "酸液史莱姆(M)",
+      "max_hp": {
+        "low": {
+          "min": 28,
+          "max": 32
+        },
+        "high": {
+          "min": 29,
+          "max": 34
+        },
+        "solve": "enumerate_each"
+      },
+      "moves": [
+        {
+          "id": "corrosive_spit",
+          "name": "腐蚀唾液",
+          "intent": "attack",
+          "damage": {
+            "low": 7,
+            "high": 8
+          },
+          "hits": 1,
+          "effects": [
+            {
+              "type": "add_status_to_discard",
+              "card": "slimed",
+              "amount": 1
+            }
+          ]
+        },
+        {
+          "id": "lick",
+          "name": "舔舐",
+          "intent": "debuff",
+          "effects": [
+            {
+              "type": "apply_weak",
+              "amount": 1
+            }
+          ]
+        },
+        {
+          "id": "tackle",
+          "name": "冲撞",
+          "intent": "attack",
+          "damage": {
+            "low": 10,
+            "high": 12
+          },
+          "hits": 1
+        }
+      ],
+      "pattern": {
+        "type": "weighted_after",
+        "weights": {
+          "corrosive_spit": 0.3,
+          "tackle": 0.4,
+          "lick": 0.3
+        },
+        "weights_a17": {
+          "corrosive_spit": 0.4,
+          "tackle": 0.4,
+          "lick": 0.2
+        },
+        "constraints": [
+          "不可 Tackle 连续两次",
+          "不可其他招连续三次",
+          "A17+ Lick 不可连续两次"
+        ]
+      }
+    },
+    "acid_slime_s": {
+      "id": "acid_slime_s",
+      "name": "酸液史莱姆(S)",
+      "max_hp": {
+        "low": {
+          "min": 8,
+          "max": 12
+        },
+        "high": {
+          "min": 9,
+          "max": 13
+        },
+        "solve": "enumerate_each"
+      },
+      "moves": [
+        {
+          "id": "lick",
+          "name": "舔舐",
+          "intent": "debuff",
+          "effects": [
+            {
+              "type": "apply_weak",
+              "amount": 1
+            }
+          ]
+        },
+        {
+          "id": "tackle",
+          "name": "冲撞",
+          "intent": "attack",
+          "damage": {
+            "low": 3,
+            "high": 4
+          },
+          "hits": 1
+        }
+      ],
+      "pattern": {
+        "type": "alternate_after_opening",
+        "opening_low": {
+          "lick": 0.5,
+          "tackle": 0.5
+        },
+        "opening_high_a17": "lick",
+        "after": "alternate",
+        "note": "fandom：首回合 50/50，之后交替；A17+ 首回合必 Lick，然后交替"
+      }
+    }
+  },
+  "monsters": [
+    {
+      "role": "medium",
+      "possible_kinds": [
+        "spike_slime_m",
+        "acid_slime_m"
+      ]
+    },
+    {
+      "role": "small",
+      "possible_kinds": [
+        "acid_slime_s",
+        "spike_slime_s"
+      ]
+    }
+  ],
+  "notes": [
+    "两种排布 50/50：尖刺M+酸液S 或 酸液M+尖刺S",
+    "粘液来源：仅 M 体 Flame Tackle / Corrosive Spit 各塞 1 张粘液进弃牌堆",
+    "酸液S AI 采纳 fandom（主站未写清）",
+    "求解器 status: data_only"
+  ]
+}
