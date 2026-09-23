@@ -33,6 +33,8 @@ from engine.draw_scheduler import (
 )
 from engine.solver import solve_draw_path, solve_encounter, solve_prefix_killable
 
+Z = (0, 0, 0, 0, 0)
+
 
 def test_opening_count():
     assert opening_combination_count() == 19
@@ -40,12 +42,12 @@ def test_opening_count():
 
 def test_strike_kills_no_damage():
     """1 张打击，敌人 6 HP，T1 击杀 → 0 战损。"""
-    path = (TurnPiles(hand=(1, 0, 0, 0), draw=(4, 4, 1, 1), discard=(0, 0, 0, 0), exhaust=(0, 0, 0, 0)),)
+    path = (TurnPiles(hand=(1, 0, 0, 0, 0), draw=(4, 4, 1, 1, 0), discard=Z, exhaust=Z),)
     assert solve_draw_path(6, path) == 0
 
 
 def test_bash_then_strike_damage():
-    state = make_turn_state(enemy_hp=20, hand=(1, 0, 1, 0), draw=(4, 4, 0, 1))
+    state = make_turn_state(enemy_hp=20, hand=(1, 0, 1, 0, 0), draw=(4, 4, 0, 1, 0))
     s = play_card(state, "B")
     assert s is not None and s.enemy_hp == 12 and s.enemy_vulnerable == 2
     s = play_card(s, "S")
@@ -53,8 +55,8 @@ def test_bash_then_strike_damage():
 
 
 def test_defend_blocks_attack():
-    hand = (0, 3, 0, 0)
-    state = make_turn_state(enemy_hp=47, hand=hand, draw=(5, 1, 1, 1))
+    hand = (0, 3, 0, 0, 0)
+    state = make_turn_state(enemy_hp=47, hand=hand, draw=(5, 1, 1, 1, 0))
     s = state
     for _ in range(3):
         s = play_card(s, "D")
@@ -65,17 +67,17 @@ def test_defend_blocks_attack():
 
 
 def test_bane_exhaust():
-    hand = (0, 0, 0, 1)
-    state = make_turn_state(enemy_hp=47, hand=hand, draw=(5, 4, 1, 0))
+    hand = (0, 0, 0, 1, 0)
+    state = make_turn_state(enemy_hp=47, hand=hand, draw=(5, 4, 1, 0, 0))
     after = end_player_turn(state)
     assert after.exhaust[3] == 1
     assert after.discard[3] == 0
 
 
 def test_draw_scheduler_t2():
-    hand_t1 = (2, 2, 1, 0)
+    hand_t1 = (2, 2, 1, 0, 0)
     draw_after_t1 = pile_sub(IRONCLAD_A10_DECK, hand_t1)
-    branches = list(_draw_at_turn_start(draw_after_t1, hand_t1, (0, 0, 0, 0)))
+    branches = list(_draw_at_turn_start(draw_after_t1, hand_t1, Z, 5))
     assert len(branches) > 1
     for b in branches:
         assert sum(b.hand) == 5
@@ -87,13 +89,13 @@ def test_path_enumeration_starts_with_19():
 
 
 def test_can_kill_this_turn():
-    state = make_turn_state(enemy_hp=6, hand=(1, 0, 0, 0), draw=(4, 4, 1, 1))
+    state = make_turn_state(enemy_hp=6, hand=(1, 0, 0, 0, 0), draw=(4, 4, 1, 1, 0))
     assert can_kill_this_turn(state)
 
 
 def test_block_sufficient_skips_extra_defend():
     """3 张防御 = 15 格挡，可挡 13 伤。"""
-    state = make_turn_state(enemy_hp=47, hand=(0, 3, 0, 0), draw=(5, 1, 1, 1))
+    state = make_turn_state(enemy_hp=47, hand=(0, 3, 0, 0, 0), draw=(5, 1, 1, 1, 0))
     s = state
     for _ in range(3):
         s = play_card(s, "D")
@@ -102,46 +104,39 @@ def test_block_sufficient_skips_extra_defend():
 
 
 def test_combination_weight():
-    # 第 1 回合 (2,2,1,0)：C(5,2)*C(4,2)*C(1,1)*C(1,0) = 10*6*1*1 = 60。
-    assert combination_weight(IRONCLAD_A10_DECK, (2, 2, 1, 0)) == 60
-    # 全打击 (5,0,0,0)：C(5,5)=1。
-    assert combination_weight(IRONCLAD_A10_DECK, (5, 0, 0, 0)) == 1
+    assert combination_weight(IRONCLAD_A10_DECK, (2, 2, 1, 0, 0)) == 60
+    assert combination_weight(IRONCLAD_A10_DECK, (5, 0, 0, 0, 0)) == 1
 
 
 def test_weighted_opening_sums_to_one():
     total = sum((p for _, p in weighted_opening()), Fraction(0))
     assert total == Fraction(1)
-    # 19 种组合，物理条数之和 = C(11,5) = 462。
     assert len(list(weighted_opening())) == 19
 
 
 def test_weighted_draw_sums_to_one():
-    """第 2 回合：留 1 张（6 选 5），权重和应为 1。"""
-    hand_t1 = (2, 2, 1, 0)
+    hand_t1 = (2, 2, 1, 0, 0)
     draw_after_t1 = pile_sub(IRONCLAD_A10_DECK, hand_t1)
     total = sum(
-        (p for _, p in weighted_draw_at_turn_start(draw_after_t1, hand_t1, (0, 0, 0, 0))),
+        (p for _, p in weighted_draw_at_turn_start(draw_after_t1, hand_t1, Z, 5)),
         Fraction(0),
     )
     assert total == Fraction(1)
 
 
 def test_solve_prefix_killable_single_turn():
-    """1 张打击、敌 6 HP：单回合前缀即可击杀，0 战损。"""
-    path = (TurnPiles(hand=(1, 0, 0, 0), draw=(4, 4, 1, 1), discard=(0, 0, 0, 0), exhaust=(0, 0, 0, 0)),)
+    path = (TurnPiles(hand=(1, 0, 0, 0, 0), draw=(4, 4, 1, 1, 0), discard=Z, exhaust=Z),)
     dmg, killable = solve_prefix_killable(6, path)
     assert killable and dmg == 0
 
 
 def test_solve_prefix_not_killable_when_too_short():
-    """敌 47 HP、仅给 1 回合 1 张打击：前缀内杀不掉 → 需延长。"""
-    path = (TurnPiles(hand=(1, 0, 0, 0), draw=(4, 4, 1, 1), discard=(0, 0, 0, 0), exhaust=(0, 0, 0, 0)),)
+    path = (TurnPiles(hand=(1, 0, 0, 0, 0), draw=(4, 4, 1, 1, 0), discard=Z, exhaust=Z),)
     _, killable = solve_prefix_killable(47, path)
     assert not killable
 
 
 def test_encounter_weight_normalized():
-    """打到击杀的加权统计：权重和必须精确为 1。"""
     for hp in (12, 30, 47):
         r = solve_encounter(hp)
         assert abs(r["total_weight"] - 1.0) < 1e-9, (hp, r["total_weight"])
@@ -150,12 +145,12 @@ def test_encounter_weight_normalized():
 
 
 def test_loader_matches_expected():
-    """加载器从 JSON 构建的数值须与试点既定值一致（去硬编码回归守卫）。"""
     from engine import load_data as L
 
-    assert L.build_deck_pile() == (5, 4, 1, 1)
+    assert L.build_deck_pile() == (5, 4, 1, 1, 0)
     cost, damage, block, vuln = L.build_card_stats()
-    assert cost == {"S": 1, "D": 1, "B": 2, "X": None}
+    assert cost["S"] == 1 and cost["D"] == 1 and cost["B"] == 2 and cost["X"] is None
+    assert cost["M"] == 1
     assert damage == {"S": 6, "B": 8}
     assert block == {"D": 5}
     assert vuln == {"B": 2}
@@ -168,7 +163,6 @@ def test_loader_matches_expected():
 
 
 def test_engine_constants_come_from_loader():
-    """引擎模块常量应等于加载器输出（确认已接线、无双份硬编码）。"""
     from engine import load_data as L
     from engine.combat import CARD_BLOCK, CARD_COST, CARD_DAMAGE, SEAPUNK_INTENTS
     from engine.deck import IRONCLAD_A10_DECK
@@ -180,24 +174,17 @@ def test_engine_constants_come_from_loader():
 
 
 def test_within_turn_kill_and_alive():
-    """单回合推进：敌 6 HP 一张打击可击杀；敌 47 HP 三张防御则存活且 0 额外战损。"""
     from engine.solver import within_turn
 
     memo: dict = {}
-    can_kill, _ = within_turn((6, 0, 0, 0, 0), (1, 0, 0, 0), memo)
+    can_kill, _ = within_turn((6, 0, 0, 0, 0), (1, 0, 0, 0, 0), memo)
     assert can_kill
-    can_kill2, alive = within_turn((47, 0, 0, 0, 0), (0, 3, 0, 0), memo)
+    can_kill2, alive = within_turn((47, 0, 0, 0, 0), (0, 3, 0, 0, 0), memo)
     assert not can_kill2
-    # 三张防御=15 格挡可全挡 13 单段攻击 → 存在额外战损 0 的后继。
     assert min(alive.values()) == 0
 
 
 def test_encounter_matches_truncated_on_killing_paths():
-    """
-    交叉验证：solve_encounter 记录的每条 ω 在前缀内击杀，
-    用旧 truncate 语义对“前缀 + 多补空抽”求解应得相同 D（已击杀，补牌不变结果）。
-    这里直接对低 HP 校验 min/max 落在合理范围。
-    """
     r = solve_encounter(12)
     assert r["min_damage"] >= 0
     assert r["max_damage"] >= r["min_damage"]

@@ -5,7 +5,7 @@ from __future__ import annotations
 from dataclasses import replace
 from typing import Optional
 
-from engine.deck import BANE, BASH, CARD_INDEX, DEFEND, Pile, STRIKE, pile_add
+from engine.deck import BANE, BASH, CARD_INDEX, DEFEND, Pile, SLIMED, STRIKE, pile_add
 from engine.load_data import build_card_stats, build_intents
 from engine.types import ENERGY_PER_TURN, EMPTY_PILE, State
 
@@ -136,7 +136,7 @@ def _can_kill_impl(
     player_strength: int,
     player_weak: int,
     energy: int,
-    hand: tuple[int, int, int, int],
+    hand: tuple[int, int, int, int, int],
     memo: dict[tuple, bool],
 ) -> bool:
     key = (enemy_hp, enemy_block, enemy_vulnerable, player_strength, player_weak, energy, hand)
@@ -246,8 +246,20 @@ def _finalize_discard(state: State) -> State:
     exhaust = state.exhaust
     bane_in_hand = state.hand[3]
     if bane_in_hand > 0:
-        discard = (discard[0], discard[1], discard[2], discard[3] - bane_in_hand)
-        exhaust = (exhaust[0], exhaust[1], exhaust[2], exhaust[3] + bane_in_hand)
+        discard = (
+            discard[0],
+            discard[1],
+            discard[2],
+            discard[3] - bane_in_hand,
+            discard[4],
+        )
+        exhaust = (
+            exhaust[0],
+            exhaust[1],
+            exhaust[2],
+            exhaust[3] + bane_in_hand,
+            exhaust[4],
+        )
     return replace(
         state,
         hand=EMPTY_PILE,

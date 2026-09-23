@@ -11,14 +11,17 @@ STRIKE = "S"
 DEFEND = "D"
 BASH = "B"
 BANE = "X"
+SLIMED = "M"
 
-CARD_ORDER = (STRIKE, DEFEND, BASH, BANE)
+CARD_ORDER = (STRIKE, DEFEND, BASH, BANE, SLIMED)
 CARD_INDEX = {c: i for i, c in enumerate(CARD_ORDER)}
+PILE_LEN = len(CARD_ORDER)
 
-# 铁甲战士 A10 牌组：从 data/sts2/characters/ironclad.json 加载（= 5 打 4 防 1 痛击 1 诅咒）。
-IRONCLAD_A10_DECK: tuple[int, int, int, int] = build_deck_pile()
+# 铁甲战士 A10 牌组：从 data/sts2/characters/ironclad.json 加载（= 5 打 4 痛击 1 诅咒 0 粘液）。
+IRONCLAD_A10_DECK: tuple[int, int, int, int, int] = build_deck_pile()
 
-Pile = tuple[int, int, int, int]
+Pile = tuple[int, int, int, int, int]
+EMPTY_PILE: Pile = (0, 0, 0, 0, 0)
 
 
 def pile_total(p: Pile) -> int:
@@ -54,13 +57,13 @@ def combinations_draw(pool: Pile, k: int) -> Iterator[tuple[Pile, Pile]]:
     if k < 0 or pile_total(pool) < k:
         return
     if k == 0:
-        yield ((0, 0, 0, 0), pool)
+        yield (EMPTY_PILE, pool)
         return
 
     limits = list(pool)
 
     def rec(idx: int, remaining: int, picked: list[int]) -> Iterator[tuple[Pile, Pile]]:
-        if idx == 4:
+        if idx == PILE_LEN:
             if remaining == 0:
                 drawn = tuple(picked)
                 left = pile_sub(pool, drawn)
@@ -88,13 +91,15 @@ def combination_weight(pool: Pile, drawn: Pile) -> int:
     return w
 
 
-def opening_hand_combinations() -> Iterator[tuple[Pile, Pile]]:
-    """第 1 回合：从 11 张中选 5 张上手（所有不同组合）。"""
-    yield from combinations_draw(IRONCLAD_A10_DECK, 5)
+def opening_hand_combinations(
+    deck: Pile = IRONCLAD_A10_DECK, hand_size: int = 5
+) -> Iterator[tuple[Pile, Pile]]:
+    """第 1 回合：从初始牌组选 hand_size 张上手（所有不同组合）。"""
+    yield from combinations_draw(deck, hand_size)
 
 
-def opening_combination_count() -> int:
-    return sum(1 for _ in opening_hand_combinations())
+def opening_combination_count(deck: Pile = IRONCLAD_A10_DECK, hand_size: int = 5) -> int:
+    return sum(1 for _ in opening_hand_combinations(deck, hand_size))
 
 
 def distinct_perm_count(deck: tuple[str, ...]) -> int:

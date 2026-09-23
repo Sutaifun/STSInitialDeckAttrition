@@ -6,10 +6,10 @@ from dataclasses import dataclass
 from fractions import Fraction
 from typing import Tuple
 
-# (打击, 防御, 痛击, 诅咒)
-Pile = Tuple[int, int, int, int]
+# (打击, 防御, 痛击, 诅咒, 粘液)
+Pile = Tuple[int, int, int, int, int]
 
-EMPTY_PILE: Pile = (0, 0, 0, 0)
+EMPTY_PILE: Pile = (0, 0, 0, 0, 0)
 MAX_TURNS = 8
 MAX_DAMAGE = 200
 ENERGY_PER_TURN = 3
