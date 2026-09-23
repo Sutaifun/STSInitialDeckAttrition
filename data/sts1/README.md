@@ -26,7 +26,20 @@
 | `encounters/cultist.json` | 邪教徒 ×1 | data_only |
 | `encounters/jaw_worm.json` | 大颚虫 ×1（加权 AI） | data_only |
 | `encounters/two_louses.json` | 2×虱（各 50% 红/绿） | data_only |
-| `encounters/small_slimes.json` | 小史莱姆两种排布 50/50 | data_only |
+| `encounters/small_slimes.json` | 小史莱姆两种排布 50/50 | **变体 A 耦合原型**（见下） |
+
+### 小史莱姆变体 A — 耦合原型固定 AI
+
+实现 PR 对 **尖刺 M + 酸液 S**（`composition.variants[0]`）采用 **固定意图表**，不展开 JSON 内 `weighted_after` / `alternate_after_opening` 全分支：
+
+| 玩家回合 | 尖刺 M | 酸液 S | 对玩家效果（A0/`low` 档） |
+|----------|--------|--------|---------------------------|
+| T1 | Flame Tackle | Tackle | 8+3=11 伤害；**弃牌堆 +1 粘液** |
+| T2 起 | Lick | Tackle | 3 伤害 + **1 层 frail**（酸液 S 的 weak 首版未建模） |
+
+- 进阶：原型测试用 `ascension=low`（A0）；HP 取两怪 `max_hp.min` 之和（28+8=**36**）。  
+- 代码：`engine/encounter.py` → `_small_slimes_a_fixed_turns`；耦合求解 `engine/coupled.py` → `solve_encounter_coupled`。  
+- 变体 B、50/50 变体枚举、全量 weighted AI：**仍 out of scope**。
 
 录入对标 A20 的 `low`/`high` 数值来源：wiki.gg Exordium 弱池与各怪物页。
 

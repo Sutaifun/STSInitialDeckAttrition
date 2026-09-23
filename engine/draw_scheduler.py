@@ -1,4 +1,4 @@
-"""层 1：枚举抽牌路径（弃牌堆组成仅由抽牌决定，与出牌无关）。"""
+"""层 1：枚举抽牌路径（独立快路径下弃牌堆组成仅由抽牌决定，与出牌无关）。"""
 
 from __future__ import annotations
 
@@ -15,7 +15,7 @@ from engine.deck import (
     pile_add,
     pile_total,
 )
-from engine.types import EMPTY_PILE, HAND_SIZE, MAX_TURNS, Pile
+from engine.types import EMPTY_PILE, MAX_TURNS, Pile
 
 
 @dataclass(frozen=True)
@@ -28,9 +28,11 @@ class TurnPiles:
     exhaust: Pile
 
 
-def _draw_at_turn_start(draw: Pile, discard: Pile, exhaust: Pile) -> Iterator[TurnPiles]:
-    """回合初从 draw/discard 抽满 5 张的所有组合分支。"""
-    for hand, new_draw, new_discard in _draw_rec(draw, discard, EMPTY_PILE, HAND_SIZE):
+def _draw_at_turn_start(
+    draw: Pile, discard: Pile, exhaust: Pile, hand_size: int
+) -> Iterator[TurnPiles]:
+    """回合初从 draw/discard 抽满 hand_size 张的所有组合分支。"""
+    for hand, new_draw, new_discard in _draw_rec(draw, discard, EMPTY_PILE, hand_size):
         yield TurnPiles(hand=hand, draw=new_draw, discard=new_discard, exhaust=exhaust)
 
 
@@ -74,8 +76,8 @@ def _end_turn_piles(piles: TurnPiles) -> tuple[Pile, Pile, Pile]:
     exhaust = piles.exhaust
     bane = piles.hand[3]
     if bane > 0:
-        discard = (discard[0], discard[1], discard[2], discard[3] - bane)
-        exhaust = (exhaust[0], exhaust[1], exhaust[2], exhaust[3] + bane)
+        discard = (discard[0], discard[1], discard[2], discard[3] - bane, discard[4])
+        exhaust = (exhaust[0], exhaust[1], exhaust[2], exhaust[3] + bane, exhaust[4])
     return piles.draw, discard, exhaust
 
 
@@ -90,20 +92,25 @@ def end_turn_piles(piles: TurnPiles) -> tuple[Pile, Pile, Pile]:
 # ---------------------------------------------------------------------------
 
 
-def weighted_opening() -> Iterator[tuple[TurnPiles, Fraction]]:
-    """第 1 回合：11 选 5 的所有组合 + 概率权重。"""
-    denom = math.comb(pile_total(IRONCLAD_A10_DECK), HAND_SIZE)
-    for drawn, left in opening_hand_combinations():
-        ways = combination_weight(IRONCLAD_A10_DECK, drawn)
+def weighted_opening(
+    deck: Pile = IRONCLAD_A10_DECK, hand_size: int = 5
+) -> Iterator[tuple[TurnPiles, Fraction]]:
+    """第 1 回合：从 deck 选 hand_size 的所有组合 + 概率权重。"""
+    denom = math.comb(pile_total(deck), hand_size)
+    for drawn, left in opening_hand_combinations(deck, hand_size):
+        ways = combination_weight(deck, drawn)
         tp = TurnPiles(hand=drawn, draw=left, discard=EMPTY_PILE, exhaust=EMPTY_PILE)
         yield tp, Fraction(ways, denom)
 
 
 def weighted_draw_at_turn_start(
-    draw: Pile, discard: Pile, exhaust: Pile
+    draw: Pile,
+    discard: Pile,
+    exhaust: Pile,
+    hand_size: int = 5,
 ) -> Iterator[tuple[TurnPiles, Fraction]]:
-    """后续回合：从 draw/discard 抽满 5 张的所有组合 + 概率权重。"""
-    for hand, new_draw, new_discard, p in _wdraw_rec(draw, discard, EMPTY_PILE, HAND_SIZE):
+    """后续回合：从 draw/discard 抽满 hand_size 张的所有组合 + 概率权重。"""
+    for hand, new_draw, new_discard, p in _wdraw_rec(draw, discard, EMPTY_PILE, hand_size):
         yield TurnPiles(hand=hand, draw=new_draw, discard=new_discard, exhaust=exhaust), p
 
 
@@ -146,7 +153,11 @@ def _wdraw_rec(
         yield pile_add(hand, drawn), left, EMPTY_PILE, Fraction(ways, denom)
 
 
-def enumerate_draw_paths(max_turns: int = MAX_TURNS) -> Iterator[tuple[TurnPiles, ...]]:
+def enumerate_draw_paths(
+    max_turns: int = MAX_TURNS,
+    deck: Pile = IRONCLAD_A10_DECK,
+    hand_size: int = 5,
+) -> Iterator[tuple[TurnPiles, ...]]:
     """
     枚举至 max_turns 回合的全部抽牌路径。
     每条路径为各回合初的 TurnPiles 序列（手牌已抽满）。
@@ -166,17 +177,21 @@ def enumerate_draw_paths(max_turns: int = MAX_TURNS) -> Iterator[tuple[TurnPiles
         if turn == 1:
             turn_iters: Iterator[TurnPiles] = (
                 TurnPiles(hand=h, draw=d, discard=EMPTY_PILE, exhaust=EMPTY_PILE)
-                for h, d in opening_hand_combinations()
+                for h, d in opening_hand_combinations(deck, hand_size)
             )
         else:
-            turn_iters = _draw_at_turn_start(draw, discard, exhaust)
+            turn_iters = _draw_at_turn_start(draw, discard, exhaust, hand_size)
 
         for tp in turn_iters:
             new_draw, new_discard, new_exhaust = _end_turn_piles(tp)
             yield from rec(turn + 1, new_draw, new_discard, new_exhaust, path + (tp,))
 
-    yield from rec(1, IRONCLAD_A10_DECK, EMPTY_PILE, EMPTY_PILE, ())
+    yield from rec(1, deck, EMPTY_PILE, EMPTY_PILE, ())
 
 
-def count_draw_paths(max_turns: int = MAX_TURNS) -> int:
-    return sum(1 for _ in enumerate_draw_paths(max_turns))
+def count_draw_paths(
+    max_turns: int = MAX_TURNS,
+    deck: Pile = IRONCLAD_A10_DECK,
+    hand_size: int = 5,
+) -> int:
+    return sum(1 for _ in enumerate_draw_paths(max_turns, deck, hand_size))

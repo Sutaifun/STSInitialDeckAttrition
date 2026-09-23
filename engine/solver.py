@@ -19,13 +19,15 @@ from engine.combat import (
     play_card,
     prepare_next_turn,
 )
-from engine.deck import DEFEND, IRONCLAD_A10_DECK
+from engine.coupled import solve_encounter_coupled
+from engine.deck import DEFEND
 from engine.draw_scheduler import (
     TurnPiles,
     end_turn_piles,
     weighted_draw_at_turn_start,
     weighted_opening,
 )
+from engine.encounter import EncounterSpec, default_pilot_spec
 from engine.progress import NullProgress, ProgressCallback
 from engine.types import (
     EMPTY_PILE,
@@ -508,6 +510,41 @@ def _path_result_to_json(enemy_hp: int, weight: Fraction, pr: PathResult) -> str
 def solve_encounter(
     enemy_hp: int,
     *,
+    spec: EncounterSpec | None = None,
+    progress: ProgressCallback | None = None,
+    gc_interval: int = 500,
+    hard_turn_cap: int = HARD_TURN_CAP,
+    export_path: str | None = None,
+) -> dict:
+    """
+    DFS 打到击杀，按组合权重 w(ω) 加权统计整场遭遇。
+
+    默认 spec=塔2 铁甲 vs 海洋混混（独立快路径金标）。
+    遭遇含 add_status_to_discard 时自动走耦合路径（见 engine/coupled.py）。
+    """
+    encounter_spec = spec or default_pilot_spec()
+    if encounter_spec.draw_mode == "coupled":
+        return solve_encounter_coupled(
+            encounter_spec,
+            enemy_hp,
+            progress=progress,
+            gc_interval=gc_interval,
+            hard_turn_cap=hard_turn_cap,
+        )
+    return _solve_encounter_independent(
+        enemy_hp,
+        spec=encounter_spec,
+        progress=progress,
+        gc_interval=gc_interval,
+        hard_turn_cap=hard_turn_cap,
+        export_path=export_path,
+    )
+
+
+def _solve_encounter_independent(
+    enemy_hp: int,
+    *,
+    spec: EncounterSpec,
     progress: ProgressCallback | None = None,
     gc_interval: int = 500,
     hard_turn_cap: int = HARD_TURN_CAP,
@@ -568,12 +605,15 @@ def solve_encounter(
         weight: Fraction,
         frontier: dict[CombatCS, int],
         best_kill: int,
+        spec: EncounterSpec,
     ) -> None:
         nonlocal truncated
         if turn_idx == 1:
-            branches = weighted_opening()
+            branches = weighted_opening(spec.starting_deck, spec.hand_size)
         else:
-            branches = weighted_draw_at_turn_start(draw, discard, exhaust)
+            branches = weighted_draw_at_turn_start(
+                draw, discard, exhaust, spec.hand_size
+            )
 
         for tp, step_p in branches:
             w = weight * step_p
@@ -604,20 +644,21 @@ def solve_encounter(
                 record(w, bk if bk < INF_DAMAGE else surv)
             else:
                 nd_, ndisc, nexh = end_turn_piles(tp)
-                dfs(turn_idx + 1, nd_, ndisc, nexh, new_prefix, w, nf, bk)
+                dfs(turn_idx + 1, nd_, ndisc, nexh, new_prefix, w, nf, bk, spec)
 
     t0 = time.perf_counter()
     init_frontier: dict[CombatCS, int] = {(enemy_hp, 0, 0, 0, 0): 0}
     try:
         dfs(
             1,
-            IRONCLAD_A10_DECK,
+            spec.starting_deck,
             EMPTY_PILE,
             EMPTY_PILE,
             (),
             Fraction(1),
             init_frontier,
             INF_DAMAGE,
+            spec,
         )
     finally:
         if export_file is not None:
